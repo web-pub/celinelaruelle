@@ -1,20 +1,28 @@
 # Site Céline Laruelle — Coach scolaire
 
-Version : **celinelaruelle V01**
+Version : **celinelaruelle V03**
+Projet Firebase : **celinelaruellecoach** — Dépôt GitHub : **celinelaruelle**
+
+Structure volontairement plate (aucun sous-dossier, à part `assets/` qui contient tout directement) :
+```
+index.html, login.html, inscription.html, admin.html, super.html, membre.html,
+mentions-legales.html, rgpd.html, cgv.html, firestore.rules, README.md
+assets/style.css
+assets/firebase-config.js, version.js, auth.js, dashboard-common.js, vault.js, membre.js
+```
 
 Site en deux parties :
 - **Partie publique** (`index.html`) : vitrine "publicitaire", ton sobre et élégant, crème/brun/taupe.
 - **Partie privée** : connexion par identifiant + mot de passe, 3 niveaux :
-  - **Super Admin** : `HeleneL` / `Helene123`
-  - **Admin** : `Celine` / `Celine4500`
-  - **Membre** : créé via demande sur `inscription.html`, validée par l'Admin.
+  - **Super Admin** : `HeleneL` / `Helene123` → `super.html`
+  - **Admin** : `Celine` / `Celine4500` → `admin.html`
+  - **Membre** : créé via demande sur `inscription.html`, validée par l'Admin → `membre.html`
 
 ## 1. Mise en place Firebase
 
-1. Va sur https://console.firebase.google.com et crée un projet **celinelaruelle**.
+1. Le projet Firebase **celinelaruellecoach** est déjà créé, et ses clés sont déjà collées dans `assets/js/firebase-config.js`.
 2. **Authentication > Sign-in method** → active **Email/Password**.
 3. **Firestore Database** → crée la base en mode production (les règles sont dans `firestore.rules`, à coller dans l'onglet "Règles").
-4. **Paramètres du projet > Général > Tes applications** → crée une appli Web, copie les clés dans `assets/js/firebase-config.js`.
 
 ## 2. Créer les deux premiers comptes (Super Admin + Admin)
 

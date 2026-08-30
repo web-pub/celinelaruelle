@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Connexion — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/css/style.css">
+<link rel="stylesheet" href="assets/style.css">
 </head>
 <body>
 <nav class="site-nav">
@@ -33,16 +33,16 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-<script src="assets/js/firebase-config.js"></script>
-<script src="assets/js/auth.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/auth.js"></script>
 <script>
 document.getElementById('btnConnexion').addEventListener('click', () => {
   const id = document.getElementById('identifiant').value;
   const mdp = document.getElementById('motdepasse').value;
   connecter(id, mdp, 'alerte', (data) => {
-    if(data.role === 'superadmin') window.location.href = 'super/index.html';
-    else if(data.role === 'admin') window.location.href = 'admin/index.html';
-    else if(data.role === 'membre') window.location.href = 'membre/index.html';
+    if(data.role === 'superadmin') window.location.href = 'super.html';
+    else if(data.role === 'admin') window.location.href = 'admin.html';
+    else if(data.role === 'membre') window.location.href = 'membre.html';
     else afficherAlerte('alerte', "Rôle inconnu pour ce compte. Contacte Hélène.");
   });
 });

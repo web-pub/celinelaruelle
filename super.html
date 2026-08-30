@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Super Admin — Céline Laruelle</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="app-shell">
+
+<header class="app-header">
+  <div class="container">
+    <div>
+      <span class="brand">Céline Laruelle</span>
+      <span class="app-badge">Super Admin</span>
+    </div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <span class="version-tag" id="versionTag"></span>
+      <a href="index.html" class="btn-home" style="color:#fff; border-color:rgba(255,255,255,.4);">← Accueil du site</a>
+      <button class="btn btn-sm btn-outline" style="color:#fff; border-color:rgba(255,255,255,.4);" onclick="deconnecter()">Déconnexion</button>
+    </div>
+  </div>
+</header>
+
+<main class="container mt-24" style="flex:1;">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="membres" onclick="activerOnglet('membres')">Membres</button>
+    <button class="tab-btn" data-tab="planning" onclick="activerOnglet('planning')">Planning</button>
+    <button class="tab-btn" data-tab="compta" onclick="activerOnglet('compta')">Compta</button>
+    <button class="tab-btn" data-tab="boutique" onclick="activerOnglet('boutique')">Boutique</button>
+    <button class="tab-btn" data-tab="motsdepasse" onclick="activerOnglet('motsdepasse')">Mots de passe</button>
+  </div>
+
+  <section id="tab-membres" class="tab-panel active">
+    <div class="toolbar"><h2 style="margin:0;">Demandes en attente</h2></div>
+    <div id="listeDemandes"></div>
+    <div class="toolbar mt-24">
+      <h2 style="margin:0;">Membres</h2>
+      <button class="btn" onclick="ouvrirModalAjoutMembre()">+ Ajouter un membre</button>
+    </div>
+    <div id="listeMembres"></div>
+  </section>
+
+  <section id="tab-planning" class="tab-panel">
+    <div class="toolbar">
+      <h2 style="margin:0;">Planning des disponibilités</h2>
+      <button class="btn" onclick="ouvrirModalCreneau()">+ Ajouter un créneau</button>
+    </div>
+    <div id="listePlanning"></div>
+  </section>
+
+  <section id="tab-compta" class="tab-panel">
+    <div class="toolbar">
+      <h2 style="margin:0;">Achats</h2>
+      <button class="btn" onclick="ouvrirModalAchat()">+ Ajouter un achat</button>
+    </div>
+    <div id="listeAchats"></div>
+    <div class="toolbar mt-24">
+      <h2 style="margin:0;">Ventes</h2>
+      <button class="btn" onclick="ouvrirModalVente()">+ Ajouter une vente</button>
+    </div>
+    <div id="listeVentes"></div>
+  </section>
+
+  <section id="tab-boutique" class="tab-panel">
+    <div class="toolbar">
+      <h2 style="margin:0;">Produits</h2>
+      <button class="btn" onclick="ouvrirModalProduit()">+ Ajouter un produit</button>
+    </div>
+    <div id="listeProduits"></div>
+    <div class="toolbar mt-24"><h2 style="margin:0;">Commandes</h2></div>
+    <div id="listeCommandes"></div>
+  </section>
+
+  <section id="tab-motsdepasse" class="tab-panel">
+    <div class="toolbar"><h2 style="margin:0;">Mots de passe — réservé à HeleneL</h2></div>
+    <div id="listeVault"></div>
+  </section>
+</main>
+
+<footer><div class="container"><span class="small-muted">© <span id="an"></span> Céline Laruelle</span><span id="versionTag2" class="small-muted"></span></div></footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/version.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/dashboard-common.js"></script>
+<script src="assets/vault.js"></script>
+<script>
+document.getElementById('an').textContent = new Date().getFullYear();
+document.getElementById('versionTag').textContent = SITE_VERSION;
+document.getElementById('versionTag2').textContent = SITE_VERSION;
+protegerPage(['superadmin'], (user, data) => { chargerMembres(); });
+</script>
+</body>
+</html>

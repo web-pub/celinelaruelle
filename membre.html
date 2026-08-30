@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Espace membre — Céline Laruelle</title>
+<link rel="stylesheet" href="assets/style.css">
+</head>
+<body class="app-shell">
+
+<header class="app-header">
+  <div class="container">
+    <div><span class="brand">Céline Laruelle</span><span class="app-badge">Membre</span></div>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <a href="index.html" class="btn-home" style="color:#fff; border-color:rgba(255,255,255,.4);">← Accueil du site</a>
+      <button class="btn btn-sm btn-outline" style="color:#fff; border-color:rgba(255,255,255,.4);" onclick="deconnecter()">Déconnexion</button>
+    </div>
+  </div>
+</header>
+
+<main class="container mt-24" style="flex:1;">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="fiche" onclick="activerOngletMembre('fiche')">Ma fiche</button>
+    <button class="tab-btn" data-tab="enfants" onclick="activerOngletMembre('enfants')">Mes enfants</button>
+    <button class="tab-btn" data-tab="planning" onclick="activerOngletMembre('planning')">Planning</button>
+    <button class="tab-btn" data-tab="boutique" onclick="activerOngletMembre('boutique')">Boutique</button>
+  </div>
+
+  <section id="tab-fiche" class="tab-panel active">
+    <div class="card" style="max-width:480px;">
+      <h2>Ma fiche</h2>
+      <div id="alerteFiche" class="alert alert-ok hidden"></div>
+      <label>Nom</label><input id="ficheNom">
+      <label>Prénom</label><input id="fichePrenom">
+      <label>Email</label><input id="ficheEmail" type="email">
+      <label>Téléphone</label><input id="ficheTelephone">
+      <button class="btn mt-24" onclick="enregistrerFiche()">Enregistrer</button>
+    </div>
+  </section>
+
+  <section id="tab-enfants" class="tab-panel">
+    <div class="toolbar">
+      <h2 style="margin:0;">Mes enfants</h2>
+      <button class="btn" onclick="ouvrirModalAjoutEnfant()">+ Ajouter un enfant</button>
+    </div>
+    <div id="listeEnfantsMembre"></div>
+  </section>
+
+  <section id="tab-planning" class="tab-panel">
+    <h2>Réserver une séance</h2>
+    <div id="listePlanningMembre"></div>
+  </section>
+
+  <section id="tab-boutique" class="tab-panel">
+    <h2>Boutique</h2>
+    <div id="listeBoutiqueMembre"></div>
+  </section>
+</main>
+
+<footer><div class="container"><span class="small-muted">© <span id="an"></span> Céline Laruelle</span></div></footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/auth.js"></script>
+<script src="assets/dashboard-common.js"></script>
+<script src="assets/membre.js"></script>
+<script>
+document.getElementById('an').textContent = new Date().getFullYear();
+
+function activerOngletMembre(nom){
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === nom));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + nom));
+}
+
+protegerPage(['membre'], (user, data) => { initEspaceMembre(user.uid); });
+</script>
+</body>
+</html>
