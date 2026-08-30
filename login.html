@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Connexion — Céline Laruelle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<nav class="site-nav">
+  <div class="container">
+    <a href="index.html" class="brand">Céline Laruelle</a>
+    <a href="index.html" class="btn-home">← Accueil</a>
+  </div>
+</nav>
+
+<section>
+  <div class="container">
+    <div class="form-box">
+      <h2 class="text-center">Espace membres</h2>
+      <p class="small-muted text-center">Connecte-toi avec ton identifiant et ton mot de passe.</p>
+      <div id="alerte" class="alert alert-error hidden"></div>
+      <label for="identifiant">Identifiant</label>
+      <input type="text" id="identifiant" autocomplete="username">
+      <label for="motdepasse">Mot de passe</label>
+      <input type="password" id="motdepasse" autocomplete="current-password">
+      <button class="btn mt-24" style="width:100%;" id="btnConnexion">Se connecter</button>
+      <p class="small-muted text-center mt-24">Pas encore de compte ? <a href="inscription.html">Faire une demande d'accompagnement</a></p>
+    </div>
+  </div>
+</section>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+document.getElementById('btnConnexion').addEventListener('click', () => {
+  const id = document.getElementById('identifiant').value;
+  const mdp = document.getElementById('motdepasse').value;
+  connecter(id, mdp, 'alerte', (data) => {
+    if(data.role === 'superadmin') window.location.href = 'super/index.html';
+    else if(data.role === 'admin') window.location.href = 'admin/index.html';
+    else if(data.role === 'membre') window.location.href = 'membre/index.html';
+    else afficherAlerte('alerte', "Rôle inconnu pour ce compte. Contacte Hélène.");
+  });
+});
+document.getElementById('motdepasse').addEventListener('keydown', e => {
+  if(e.key === 'Enter') document.getElementById('btnConnexion').click();
+});
+</script>
+</body>
+</html>

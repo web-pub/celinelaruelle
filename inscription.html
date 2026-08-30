@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demande d'accompagnement — Céline Laruelle</title>
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<nav class="site-nav">
+  <div class="container">
+    <a href="index.html" class="brand">Céline Laruelle</a>
+    <a href="index.html" class="btn-home">← Accueil</a>
+  </div>
+</nav>
+
+<section>
+  <div class="container">
+    <div class="form-box" style="max-width:560px;">
+      <h2 class="text-center">Demande d'accompagnement</h2>
+      <p class="small-muted text-center">Complète ce formulaire, ta demande sera examinée avant activation de ton accès.</p>
+      <div id="alerte" class="alert alert-error hidden"></div>
+      <div id="succes" class="alert alert-ok hidden"></div>
+
+      <div id="formulaire">
+        <label>Nom</label><input type="text" id="nom">
+        <label>Prénom</label><input type="text" id="prenom">
+        <label>Adresse e-mail</label><input type="email" id="email">
+        <label>Téléphone</label><input type="tel" id="telephone">
+        <label>Pourquoi as-tu besoin d'aide ?</label>
+        <textarea id="raison" rows="4" placeholder="Décris brièvement la situation (matière, difficulté, âge de l'enfant...)"></textarea>
+
+        <div class="divider"></div>
+        <p class="small-muted">Choisis un identifiant et un mot de passe pour ton futur espace membre (utilisés seulement si ta demande est acceptée).</p>
+        <label>Identifiant souhaité</label><input type="text" id="username">
+        <label>Mot de passe (6 caractères min., sans caractère spécial)</label>
+        <input type="password" id="motdepasse">
+        <p class="field-hint">Uniquement lettres et chiffres, 6 caractères minimum.</p>
+
+        <button class="btn mt-24" style="width:100%;" id="btnEnvoyer">Envoyer ma demande</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/js/firebase-config.js"></script>
+<script src="assets/js/auth.js"></script>
+<script>
+document.getElementById('btnEnvoyer').addEventListener('click', async () => {
+  masquerAlerte('alerte');
+  const nom = document.getElementById('nom').value.trim();
+  const prenom = document.getElementById('prenom').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const telephone = document.getElementById('telephone').value.trim();
+  const raison = document.getElementById('raison').value.trim();
+  const username = document.getElementById('username').value.trim();
+  const motdepasse = document.getElementById('motdepasse').value;
+
+  if(!nom || !prenom || !email || !telephone || !username || !motdepasse){
+    afficherAlerte('alerte', "Merci de remplir tous les champs.");
+    return;
+  }
+  if(motdepasse.length < 6 || /[^a-zA-Z0-9]/.test(motdepasse)){
+    afficherAlerte('alerte', "Le mot de passe doit contenir au moins 6 caractères, sans caractère spécial.");
+    return;
+  }
+
+  const btn = document.getElementById('btnEnvoyer');
+  btn.disabled = true; btn.textContent = 'Envoi en cours...';
+
+  try{
+    await db.collection('demandes_inscription').add({
+      nom, prenom, email, telephone, raison, username, motdepasse,
+      statut: 'en_attente',
+      dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('formulaire').classList.add('hidden');
+    afficherAlerte('succes', "Ta demande a bien été envoyée ! Céline reviendra vers toi rapidement.", 'ok');
+    document.getElementById('succes').classList.remove('hidden');
+  }catch(err){
+    afficherAlerte('alerte', traduireErreur(err));
+    btn.disabled = false; btn.textContent = 'Envoyer ma demande';
+  }
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,118 @@
+// ===================================================================
+// FIRESTORE RULES — Projet : celinelaruelle
+// Version du site : celinelaruelle V01
+// ===================================================================
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function estConnecte() {
+      return request.auth != null;
+    }
+    function monRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+    function estAdminOuSuper() {
+      return estConnecte() && (monRole() == 'admin' || monRole() == 'superadmin');
+    }
+    function estSuperAdmin() {
+      return estConnecte() && monRole() == 'superadmin';
+    }
+    function estSoiMeme(uid) {
+      return estConnecte() && request.auth.uid == uid;
+    }
+
+    // ---- users : fiche technique (rôle, dernière connexion) ----
+    match /users/{uid} {
+      allow read: if estSoiMeme(uid) || estAdminOuSuper();
+      allow create: if estAdminOuSuper();
+      allow update: if estSoiMeme(uid) &&
+                     request.resource.data.diff(resource.data).affectedKeys().hasOnly(['derniereConnexion'])
+                     || estAdminOuSuper();
+      allow delete: if estSuperAdmin();
+    }
+
+    // ---- passwords_vault : UNIQUEMENT super admin (HeleneL) ----
+    match /passwords_vault/{uid} {
+      allow read: if estSuperAdmin();
+      allow create: if estAdminOuSuper();
+      allow update: if estSuperAdmin() ||
+                     (estSoiMeme(uid) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['derniereConnexion']));
+      allow delete: if estSuperAdmin();
+    }
+
+    // ---- membres : fiche parent ----
+    match /membres/{uid} {
+      allow read: if estSoiMeme(uid) || estAdminOuSuper();
+      allow create: if estAdminOuSuper();
+      allow update: if estSoiMeme(uid) || estAdminOuSuper();
+      allow delete: if estAdminOuSuper();
+    }
+
+    // ---- enfants ----
+    match /enfants/{enfantId} {
+      allow read: if estAdminOuSuper() || (estConnecte() && resource.data.membreId == request.auth.uid);
+      allow create: if estAdminOuSuper() || (estConnecte() && request.resource.data.membreId == request.auth.uid);
+      allow update, delete: if estAdminOuSuper();
+    }
+
+    // ---- planning_disponibilites ----
+    match /planning_disponibilites/{id} {
+      allow read: if estConnecte();
+      allow write: if estAdminOuSuper();
+    }
+
+    // ---- reservations ----
+    match /reservations/{id} {
+      allow read: if estAdminOuSuper() || (estConnecte() && resource.data.membreId == request.auth.uid);
+      allow create: if estAdminOuSuper() || (estConnecte() && request.resource.data.membreId == request.auth.uid);
+      allow update, delete: if estAdminOuSuper() || (estConnecte() && resource.data.membreId == request.auth.uid);
+    }
+
+    // ---- compta (achats / ventes) : admin & super admin uniquement ----
+    match /compta_achats/{id} {
+      allow read, write: if estAdminOuSuper();
+    }
+    match /compta_ventes/{id} {
+      allow read, write: if estAdminOuSuper();
+    }
+
+    // ---- boutique_produits ----
+    match /boutique_produits/{id} {
+      allow read: if estConnecte();
+      allow write: if estAdminOuSuper();
+    }
+
+    // ---- commandes ----
+    match /commandes/{id} {
+      allow read: if estAdminOuSuper() || (estConnecte() && resource.data.membreId == request.auth.uid);
+      allow create: if estAdminOuSuper() || (estConnecte() && request.resource.data.membreId == request.auth.uid);
+      allow update, delete: if estAdminOuSuper();
+    }
+
+    // ---- demandes_inscription : formulaire public ----
+    match /demandes_inscription/{id} {
+      allow create: if true;
+      allow read, update, delete: if estAdminOuSuper();
+    }
+
+    // ---- config (version, compteur de factures) ----
+    match /config/{id} {
+      allow read: if estConnecte();
+      allow write: if estAdminOuSuper();
+    }
+
+    // ---- connexions_log : historique des connexions ----
+    match /connexions_log/{id} {
+      allow create: if estConnecte();
+      allow read: if estAdminOuSuper();
+      allow update, delete: if false;
+    }
+
+    // Par défaut, tout le reste est refusé
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
