@@ -36,16 +36,21 @@ async function chargerEnfantsMembre(){
   const snap = await db.collection('enfants').where('membreId','==',membreUid).get();
   if(snap.empty){ zone.innerHTML = '<p class="small-muted">Aucun enfant enregistré pour le moment.</p>'; return; }
   let html = '';
+  const ids = [];
   snap.forEach(doc => {
     const e = doc.data();
-    const suivi = (e.suivi || []).map(s => `<li><strong>${s.date}</strong> — ${s.note}</li>`).join('') || '<li class="small-muted">Pas encore de suivi.</li>';
+    ids.push(doc.id);
     html += `<div class="card mt-24">
-      <h3>${e.prenom} ${e.nom}</h3>
+      <h3 style="margin-bottom:2px;">${e.prenom} ${e.nom}</h3>
       <p class="small-muted">Né(e) le ${e.dateNaissance || '—'} · ${e.ecole || '—'} · ${e.classe || '—'}</p>
-      <strong>Suivi de Céline :</strong><ul>${suivi}</ul>
+      <div class="divider"></div>
+      <strong>Journal de classe</strong>
+      <p class="small-muted" style="margin-top:2px;">Le suivi de Céline, mis à jour au fil de l'accompagnement.</p>
+      <div id="journalParent_${doc.id}" class="mt-24"><p class="small-muted">Chargement...</p></div>
     </div>`;
   });
   zone.innerHTML = html;
+  ids.forEach(id => chargerJournalEnfant(id, 'journalParent_' + id));
 }
 
 function ouvrirModalAjoutEnfant(){

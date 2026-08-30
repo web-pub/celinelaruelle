@@ -33,6 +33,17 @@ function masquerAlerte(elementId){
   if(el) el.classList.add('hidden');
 }
 
+/* Bascule affichage/masquage d'un mot de passe via l'icône œil */
+const ICONE_OEIL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg>';
+const ICONE_OEIL_BARRE = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 3l18 18"/><path d="M10.6 5.2A11 11 0 0 1 12 5c7 0 11 7 11 7a13.3 13.3 0 0 1-3.4 4M6.6 6.6C3.8 8.3 1 12 1 12s4 7 11 7a10.6 10.6 0 0 0 5-1.2"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>';
+
+function togglePw(id, btn){
+  const el = document.getElementById(id);
+  if(!el) return;
+  if(el.type === 'password'){ el.type = 'text'; btn.innerHTML = ICONE_OEIL_BARRE; }
+  else { el.type = 'password'; btn.innerHTML = ICONE_OEIL; }
+}
+
 /* Connexion par identifiant + mot de passe */
 function connecter(identifiant, motDePasse, alerteId, onSuccess){
   masquerAlerte(alerteId);

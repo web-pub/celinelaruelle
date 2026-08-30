@@ -114,6 +114,8 @@ async function refuserDemande(demandeId){
   chargerMembres();
 }
 
+const CATEGORIES_JOURNAL = ['Général','Devoirs','Comportement','Points positifs','À travailler'];
+
 async function voirFicheMembre(membreId){
   const snap = await db.collection('membres').doc(membreId).get();
   const m = snap.data();
@@ -121,18 +123,18 @@ async function voirFicheMembre(membreId){
   let enfantsHtml = '<p class="small-muted">Aucun enfant enregistré.</p>';
   if(!enfantsSnap.empty){
     enfantsHtml = '';
-    enfantsSnap.forEach(doc => {
+    for(const doc of enfantsSnap.docs){
       const e = doc.data();
-      const suivi = (e.suivi || []).map(s => `<li><strong>${s.date}</strong> — ${s.note}</li>`).join('') || '<li class="small-muted">Pas encore de suivi.</li>';
       enfantsHtml += `<div class="card mt-24">
-        <h3>${e.prenom} ${e.nom}</h3>
-        <p class="small-muted">Né(e) le ${e.dateNaissance || '—'} · ${e.ecole || '—'} · ${e.classe || '—'}</p>
-        <strong>Suivi :</strong><ul>${suivi}</ul>
-        <label>Ajouter une note de suivi</label>
-        <textarea id="noteSuivi_${doc.id}" rows="2"></textarea>
-        <button class="btn btn-sm mt-24" onclick="ajouterSuivi('${doc.id}')">Ajouter</button>
+        <div class="toolbar" style="margin-bottom:8px;">
+          <div><h3 style="margin:0;">${e.prenom} ${e.nom}</h3>
+          <p class="small-muted" style="margin:2px 0 0;">Né(e) le ${e.dateNaissance || '—'} · ${e.ecole || '—'} · ${e.classe || '—'}</p></div>
+          <button class="btn btn-sm" onclick="ouvrirModalEntreeJournal('${doc.id}','${membreId}')">+ Ajouter au journal</button>
+        </div>
+        <strong>Journal de classe</strong>
+        <div id="journal_${doc.id}" class="mt-24"><p class="small-muted">Chargement...</p></div>
       </div>`;
-    });
+    }
   }
   ouvrirModal(`
     <h2>${m.prenom} ${m.nom}</h2>
@@ -143,18 +145,56 @@ async function voirFicheMembre(membreId){
     ${enfantsHtml}
     <div class="text-center mt-24"><button class="btn btn-outline" onclick="fermerModal()">Fermer</button></div>
   `);
+  enfantsSnap.forEach(doc => chargerJournalEnfant(doc.id, 'journal_' + doc.id));
 }
 
-async function ajouterSuivi(enfantId){
-  const texte = document.getElementById('noteSuivi_' + enfantId).value.trim();
-  if(!texte) return;
-  const ref = db.collection('enfants').doc(enfantId);
-  const snap = await ref.get();
-  const suivi = snap.data().suivi || [];
-  suivi.push({ date: new Date().toLocaleDateString('fr-BE'), note: texte });
-  await ref.update({ suivi });
+async function chargerJournalEnfant(enfantId, containerId){
+  const zone = document.getElementById(containerId);
+  if(!zone) return;
+  const snap = await db.collection('journal_entries').where('enfantId','==',enfantId).orderBy('dateCreation','desc').get();
+  if(snap.empty){ zone.innerHTML = '<p class="small-muted">Aucune entrée pour le moment.</p>'; return; }
+  let html = '<div class="journal-timeline">';
+  snap.forEach(doc => {
+    const j = doc.data();
+    html += `<div class="journal-entry">
+      <div class="journal-entry-head">
+        <span class="pill pill-categorie">${j.categorie}</span>
+        <span class="small-muted">${j.dateAffichage} — ${j.auteur}</span>
+      </div>
+      <p>${j.contenu}</p>
+    </div>`;
+  });
+  html += '</div>';
+  zone.innerHTML = html;
+}
+
+function ouvrirModalEntreeJournal(enfantId, membreId){
+  const options = CATEGORIES_JOURNAL.map(c => `<option value="${c}">${c}</option>`).join('');
+  ouvrirModal(`
+    <h2>Ajouter au journal de classe</h2>
+    <div id="alerteModal" class="alert alert-error hidden"></div>
+    <label>Catégorie</label>
+    <select id="jr_categorie">${options}</select>
+    <label>Contenu</label>
+    <textarea id="jr_contenu" rows="4" placeholder="Ce qui s'est passé, les progrès observés, les points d'attention..."></textarea>
+    <div class="text-center mt-24">
+      <button class="btn" onclick="enregistrerEntreeJournal('${enfantId}','${membreId}')">Enregistrer</button>
+      <button class="btn btn-outline" onclick="fermerModal(); voirFicheMembre('${membreId}')">Annuler</button>
+    </div>
+  `);
+}
+
+async function enregistrerEntreeJournal(enfantId, membreId){
+  const categorie = document.getElementById('jr_categorie').value;
+  const contenu = document.getElementById('jr_contenu').value.trim();
+  if(!contenu){ afficherAlerte('alerteModal', "Merci de décrire l'entrée du journal."); return; }
+  await db.collection('journal_entries').add({
+    enfantId, membreId, categorie, contenu, auteur: 'Céline',
+    dateAffichage: new Date().toLocaleDateString('fr-BE'),
+    dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+  });
   fermerModal();
-  alert("Note de suivi ajoutée.");
+  voirFicheMembre(membreId);
 }
 
 function ouvrirModalAjoutMembre(){
@@ -167,7 +207,10 @@ function ouvrirModalAjoutMembre(){
     <label>Téléphone</label><input id="am_telephone">
     <label>Identifiant</label><input id="am_username">
     <label>Mot de passe (6 caractères min., sans caractère spécial)</label>
-    <input id="am_motdepasse" type="text">
+    <div class="password-wrap">
+      <input id="am_motdepasse" type="password">
+      <button type="button" class="toggle-eye" onclick="togglePw('am_motdepasse', this)" aria-label="Afficher le mot de passe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+    </div>
     <div class="text-center mt-24">
       <button class="btn" onclick="creerMembreManuel()">Créer le membre</button>
       <button class="btn btn-outline" onclick="fermerModal()">Annuler</button>
@@ -264,10 +307,11 @@ async function chargerCompta(){
   let rowsA = '';
   achatsSnap.forEach(doc => {
     const a = doc.data();
-    rowsA += `<tr><td>${a.date}</td><td>${a.fournisseur}</td><td>${a.montantTVAC} €</td><td>${a.categorie}</td><td>${a.deductibilite}%</td></tr>`;
+    const amo = a.amortissable ? `Amorti sur ${a.dureeAns} an(s)` : 'Charge directe';
+    rowsA += `<tr><td>${a.date}</td><td>${a.fournisseur}</td><td>${a.montantTVAC} €</td><td>${a.categorie}</td><td>${a.deductibilite}%</td><td>${amo}</td></tr>`;
   });
   zoneAchats.innerHTML = achatsSnap.empty ? '<p class="small-muted">Aucun achat enregistré.</p>' :
-    `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Fournisseur</th><th>Montant TVAC</th><th>Catégorie</th><th>Déductibilité</th></tr></thead><tbody>${rowsA}</tbody></table></div>`;
+    `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Fournisseur</th><th>Montant TVAC</th><th>Catégorie</th><th>Déductibilité</th><th>Amortissement</th></tr></thead><tbody>${rowsA}</tbody></table></div>`;
 
   const ventesSnap = await db.collection('compta_ventes').orderBy('date','desc').get();
   let rowsV = '';
@@ -277,21 +321,72 @@ async function chargerCompta(){
   });
   zoneVentes.innerHTML = ventesSnap.empty ? '<p class="small-muted">Aucune vente enregistrée.</p>' :
     `<div class="table-wrap"><table><thead><tr><th>N° facture</th><th>Date</th><th>Client</th><th>Description</th><th>Montant</th></tr></thead><tbody>${rowsV}</tbody></table></div>`;
+
+  const selectAnnee = document.getElementById('pl_annee');
+  if(selectAnnee && !selectAnnee.dataset.rempli){
+    selectAnnee.innerHTML = genererOptionsAnnees();
+    selectAnnee.dataset.rempli = '1';
+  }
+  calculerPL();
+  chargerParametresCategories();
 }
 
-function ouvrirModalAchat(){
+/* ---- Catégories de charges (nom, % déductibilité, amortissement) ---- */
+/* Gérées dans la section "Paramètres" repliable en bas de l'onglet Compta */
+async function recupererCategories(){
+  const snap = await db.collection('compta_categories').orderBy('nom').get();
+  return snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+}
+
+async function chargerParametresCategories(){
+  const zone = document.getElementById('listeCategories');
+  if(!zone) return;
+  const categories = await recupererCategories();
+  let rows = categories.map(c => `<tr>
+    <td>${c.nom}</td><td>${c.deductibilite}%</td>
+    <td>${c.amortissable ? 'Oui — ' + c.dureeAns + ' an(s)' : 'Non'}</td>
+    <td><button class="btn btn-sm btn-danger" onclick="supprimerCategorie('${c.id}')">Supprimer</button></td>
+  </tr>`).join('');
+  if(!rows) rows = '<tr><td colspan="4" class="small-muted">Aucune catégorie pour le moment.</td></tr>';
+  zone.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Nom</th><th>Déductibilité</th><th>Amortissement</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+async function creerCategorie(){
+  const nom = document.getElementById('cat_nom').value.trim();
+  const deductibilite = parseFloat(document.getElementById('cat_deductibilite').value || '100');
+  const amortissable = document.getElementById('cat_amortissable').checked;
+  const dureeAns = amortissable ? parseInt(document.getElementById('cat_duree').value || '1', 10) : 1;
+  if(!nom){ afficherAlerte('alerteCategorie', "Merci de donner un nom à la catégorie."); return; }
+  await db.collection('compta_categories').add({ nom, deductibilite, amortissable, dureeAns });
+  document.getElementById('cat_nom').value = '';
+  document.getElementById('cat_deductibilite').value = '100';
+  document.getElementById('cat_amortissable').checked = false;
+  document.getElementById('cat_duree_wrap').classList.add('hidden');
+  masquerAlerte('alerteCategorie');
+  chargerParametresCategories();
+}
+
+async function supprimerCategorie(id){
+  if(!confirm("Supprimer cette catégorie ? (les achats déjà enregistrés ne sont pas modifiés)")) return;
+  await db.collection('compta_categories').doc(id).delete();
+  chargerParametresCategories();
+}
+
+/* ---- Achats ---- */
+async function ouvrirModalAchat(){
+  const categories = await recupererCategories();
+  const options = categories.length
+    ? categories.map(c => `<option value="${c.id}">${c.nom} (${c.deductibilite}%${c.amortissable ? ', amorti sur '+c.dureeAns+' an(s)' : ''})</option>`).join('')
+    : '<option value="">— Aucune catégorie —</option>';
   ouvrirModal(`
     <h2>Ajouter un achat</h2>
+    <div id="alerteModal" class="alert alert-error hidden"></div>
     <label>Date</label><input id="ac_date" type="date" value="${new Date().toISOString().slice(0,10)}">
     <label>Fournisseur</label><input id="ac_fournisseur">
     <label>Montant TVAC (€)</label><input id="ac_montant" type="number" step="0.01">
     <label>Catégorie</label>
-    <select id="ac_categorie">
-      <option value="Fournitures">Fournitures (100%)</option>
-      <option value="Documentation">Documentation (100%)</option>
-      <option value="Restaurant">Restaurant (67%)</option>
-      <option value="Autre">Autre (100%)</option>
-    </select>
+    <select id="ac_categorie">${options}</select>
+    ${categories.length ? '' : '<p class="small-muted">Aucune catégorie créée : ferme cette fenêtre et ouvre "Paramètres" en bas de la page Compta pour en ajouter une.</p>'}
     <div class="text-center mt-24">
       <button class="btn" onclick="creerAchat()">Ajouter</button>
       <button class="btn btn-outline" onclick="fermerModal()">Annuler</button>
@@ -303,10 +398,17 @@ async function creerAchat(){
   const date = document.getElementById('ac_date').value;
   const fournisseur = document.getElementById('ac_fournisseur').value.trim();
   const montantTVAC = parseFloat(document.getElementById('ac_montant').value || '0');
-  const categorie = document.getElementById('ac_categorie').value;
-  const deductibilite = categorie === 'Restaurant' ? 67 : 100;
-  if(!fournisseur || !montantTVAC){ alert("Merci de compléter le fournisseur et le montant."); return; }
-  await db.collection('compta_achats').add({ date, fournisseur, montantTVAC, categorie, deductibilite });
+  const categorieId = document.getElementById('ac_categorie').value;
+  if(!fournisseur || !montantTVAC){ afficherAlerte('alerteModal', "Merci de compléter le fournisseur et le montant."); return; }
+  if(!categorieId){ afficherAlerte('alerteModal', "Merci de choisir une catégorie (à créer dans Paramètres si besoin)."); return; }
+
+  const catSnap = await db.collection('compta_categories').doc(categorieId).get();
+  const cat = catSnap.data();
+  await db.collection('compta_achats').add({
+    date, fournisseur, montantTVAC,
+    categorie: cat.nom, deductibilite: cat.deductibilite,
+    amortissable: cat.amortissable, dureeAns: cat.dureeAns
+  });
   fermerModal();
   chargerCompta();
 }
@@ -559,6 +661,57 @@ async function supprimerLivre(livreId){
   if(!confirm("Supprimer définitivement ce livre ?")) return;
   await db.collection('livres').doc(livreId).delete();
   chargerLivres();
+}
+
+/* ---- P&L simplifié ---- */
+async function calculerPL(){
+  const zone = document.getElementById('resultatPL');
+  if(!zone) return;
+  const select = document.getElementById('pl_annee');
+  const annee = parseInt((select ? select.value : '') || new Date().getFullYear(), 10);
+
+  const [achatsSnap, ventesSnap] = await Promise.all([
+    db.collection('compta_achats').get(),
+    db.collection('compta_ventes').get()
+  ]);
+
+  let totalVentes = 0;
+  ventesSnap.forEach(doc => {
+    const v = doc.data();
+    if(new Date(v.date).getFullYear() === annee) totalVentes += v.montant;
+  });
+
+  let totalCharges = 0;
+  achatsSnap.forEach(doc => {
+    const a = doc.data();
+    const anneeAchat = new Date(a.date).getFullYear();
+    const deduct = (a.deductibilite ?? 100) / 100;
+    if(a.amortissable){
+      const duree = a.dureeAns || 1;
+      if(annee >= anneeAchat && annee < anneeAchat + duree){
+        totalCharges += (a.montantTVAC / duree) * deduct;
+      }
+    }else{
+      if(anneeAchat === annee) totalCharges += a.montantTVAC * deduct;
+    }
+  });
+
+  const resultat = totalVentes - totalCharges;
+  zone.innerHTML = `
+    <div class="grid-3">
+      <div class="stat-card"><span class="stat-number">${totalVentes.toFixed(2)} €</span><p>Ventes ${annee}</p></div>
+      <div class="stat-card"><span class="stat-number">${totalCharges.toFixed(2)} €</span><p>Charges déductibles ${annee}</p></div>
+      <div class="stat-card"><span class="stat-number" style="color:${resultat>=0?'var(--ok)':'var(--error)'};">${resultat.toFixed(2)} €</span><p>Résultat net simplifié</p></div>
+    </div>`;
+}
+
+function genererOptionsAnnees(){
+  const courante = new Date().getFullYear();
+  let options = '';
+  for(let a = courante; a >= courante - 5; a--){
+    options += `<option value="${a}">${a}</option>`;
+  }
+  return options;
 }
 
 /* ---------------------- ONGLETS (navigation) ---------------------- */
