@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Admin — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V08">
+<link rel="stylesheet" href="assets/style.css?v=V10">
 </head>
 <body class="app-shell">
 
@@ -53,6 +53,12 @@
 
   <section id="tab-compta" class="tab-panel">
     <div class="toolbar">
+      <h2 style="margin:0;">P&amp;L simplifié</h2>
+      <select id="pl_annee" onchange="calculerPL()" style="width:auto;"></select>
+    </div>
+    <div id="resultatPL" class="mb-24"><p class="small-muted">Chargement...</p></div>
+
+    <div class="toolbar mt-24">
       <h2 style="margin:0;">Achats</h2>
       <button class="btn" onclick="ouvrirModalAchat()">+ Ajouter un achat</button>
     </div>
@@ -62,6 +68,25 @@
       <button class="btn" onclick="ouvrirModalVente()">+ Ajouter une vente</button>
     </div>
     <div id="listeVentes"></div>
+
+    <details class="settings-block mt-24">
+      <summary>Paramètres — Catégories de charges</summary>
+      <div class="mt-24">
+        <p class="small-muted">Une fois vos catégories bien encodées, vous n'aurez normalement plus besoin d'y toucher. Disponible depuis Admin et Super Admin.</p>
+        <div id="listeCategories"></div>
+        <div class="divider"></div>
+        <h3>Nouvelle catégorie</h3>
+        <div id="alerteCategorie" class="alert alert-error hidden"></div>
+        <label>Nom</label><input id="cat_nom" placeholder="Ex. Cadeau, Restaurant, Électricité...">
+        <label>% déductibilité</label><input id="cat_deductibilite" type="number" min="0" max="100" value="100">
+        <p class="field-hint">Exemples : cadeau 50% · restaurant 67% · électricité 20%</p>
+        <label><input type="checkbox" id="cat_amortissable" style="width:auto; display:inline-block; margin-right:8px;" onchange="document.getElementById('cat_duree_wrap').classList.toggle('hidden', !this.checked)"> Bien amortissable (achat coûteux étalé sur plusieurs années)</label>
+        <div id="cat_duree_wrap" class="hidden">
+          <label>Durée d'amortissement (années)</label><input id="cat_duree" type="number" min="1" value="3">
+        </div>
+        <button class="btn btn-sm mt-24" onclick="creerCategorie()">Ajouter la catégorie</button>
+      </div>
+    </details>
   </section>
 
   <section id="tab-boutique" class="tab-panel">

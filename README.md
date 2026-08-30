@@ -1,6 +1,6 @@
 # Site Céline Laruelle — Coach scolaire
 
-Version : **celinelaruelle V08**
+Version : **celinelaruelle V10**
 Projet Firebase : **celinelaruellecoach** — Dépôt GitHub : **celinelaruelle**
 
 Structure volontairement plate (aucun sous-dossier, à part `assets/` qui contient tout directement) :
@@ -81,7 +81,15 @@ Une fois connectée, HeleneL peut ajouter d'autres admins/membres directement de
 |---|---|---|
 | membreId | string | UID du parent |
 | nom, prenom, dateNaissance, ecole, classe | string | identité de l'enfant |
-| suivi | array | liste de `{ date, note }` ajoutées par Céline |
+
+### `journal_entries` — le "journal de classe"
+| Champ | Type | Description |
+|---|---|---|
+| enfantId, membreId | string | références |
+| categorie | string | Général / Devoirs / Comportement / Points positifs / À travailler |
+| contenu | string | texte de l'entrée |
+| auteur | string | "Céline" |
+| dateAffichage, dateCreation | — | date lisible + tri |
 
 ### `planning_disponibilites`
 | Champ | Type | Description |
@@ -98,20 +106,29 @@ Une fois connectée, HeleneL peut ajouter d'autres admins/membres directement de
 | statut | string | `confirmee` |
 | dateReservation | timestamp | date de la réservation |
 
+### `compta_categories` — catégories de charges personnalisables
+| Champ | Type | Description |
+|---|---|---|
+| nom | string | nom de la catégorie |
+| deductibilite | number | % déductible |
+| amortissable | boolean | `true` si le bien doit être étalé sur plusieurs années |
+| dureeAns | number | durée d'amortissement en années (si amortissable) |
+
 ### `compta_achats`
 | Champ | Type | Description |
 |---|---|---|
 | date | string | date de l'achat |
 | fournisseur | string | fournisseur |
 | montantTVAC | number | montant TVAC |
-| categorie | string | catégorie de frais |
-| deductibilite | number | % déductible (100 par défaut, 67 pour restaurant) |
+| categorie, deductibilite, amortissable, dureeAns | — | copiés depuis la catégorie choisie au moment de l'achat |
 
 ### `compta_ventes`
 | Champ | Type | Description |
 |---|---|---|
 | numeroFacture | string | ex. "2026 001" (compteur annuel automatique) |
 | date, client, description, montant | — | détails de la vente |
+
+Le **P&L simplifié** (en haut de l'onglet Compta) calcule, pour l'année choisie : total des ventes − charges déductibles de l'année (un achat amortissable ne compte que pour `montant / durée` par an, sur sa période d'amortissement).
 
 ### `boutique_produits`
 | Champ | Type | Description |

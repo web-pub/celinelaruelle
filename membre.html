@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Espace membre — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V08">
+<link rel="stylesheet" href="assets/style.css?v=V10">
 </head>
 <body class="app-shell">
 
@@ -27,14 +27,24 @@
   </div>
 
   <section id="tab-fiche" class="tab-panel active">
-    <div class="card" style="max-width:480px;">
-      <h2>Ma fiche</h2>
-      <div id="alerteFiche" class="alert alert-ok hidden"></div>
-      <label>Nom</label><input id="ficheNom">
-      <label>Prénom</label><input id="fichePrenom">
-      <label>Email</label><input id="ficheEmail" type="email">
-      <label>Téléphone</label><input id="ficheTelephone">
-      <button class="btn mt-24" onclick="enregistrerFiche()">Enregistrer</button>
+    <div class="grid-2">
+      <div class="card" style="max-width:480px;">
+        <h2>Ma fiche</h2>
+        <div id="alerteFiche" class="alert alert-ok hidden"></div>
+        <label>Nom</label><input id="ficheNom">
+        <label>Prénom</label><input id="fichePrenom">
+        <label>Email</label><input id="ficheEmail" type="email">
+        <label>Téléphone</label><input id="ficheTelephone">
+        <button class="btn mt-24" onclick="enregistrerFiche()">Enregistrer</button>
+      </div>
+      <div class="card carte-contact">
+        <span class="hero-eyebrow">Votre contact</span>
+        <h3 style="margin-top:6px;">Céline Laruelle</h3>
+        <p class="small-muted" style="margin-top:-8px;">Coach scolaire</p>
+        <div class="divider"></div>
+        <p>Rue Vergiers 66<br>4500 Huy</p>
+        <p class="small-muted mt-24">Pour toute question, utilisez le formulaire de contact du site ou la messagerie du planning. Le journal de classe de votre/vos enfant(s) est votre canal de suivi principal.</p>
+      </div>
     </div>
   </section>
 

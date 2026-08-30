@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Connexion — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V08">
+<link rel="stylesheet" href="assets/style.css?v=V10">
 </head>
 <body>
 <nav class="site-nav">
@@ -23,7 +23,10 @@
       <label for="identifiant">Identifiant</label>
       <input type="text" id="identifiant" autocomplete="username">
       <label for="motdepasse">Mot de passe</label>
-      <input type="text" id="motdepasse" autocomplete="current-password">
+      <div class="password-wrap">
+        <input type="password" id="motdepasse" autocomplete="current-password">
+        <button type="button" class="toggle-eye" onclick="togglePw('motdepasse', this)" aria-label="Afficher le mot de passe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
+      </div>
       <button class="btn mt-24" style="width:100%;" id="btnConnexion">Se connecter</button>
       <p class="small-muted text-center mt-24">Pas encore de compte ? <a href="inscription.html">Faire une demande d'accompagnement</a></p>
     </div>

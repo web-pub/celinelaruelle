@@ -1,7 +1,7 @@
 // ===================================================================
 // FIRESTORE RULES — Projet Firebase : celinelaruellecoach
 // Dépôt GitHub (hébergement) : celinelaruelle
-// Version du site : celinelaruelle V08
+// Version du site : celinelaruelle V10
 // ===================================================================
 rules_version = '2';
 
@@ -77,6 +77,15 @@ service cloud.firestore {
     }
     match /compta_ventes/{id} {
       allow read, write: if estAdminOuSuper();
+    }
+    match /compta_categories/{id} {
+      allow read, write: if estAdminOuSuper();
+    }
+
+    // ---- journal_entries : écrit par Admin/Super Admin, lu aussi par le parent concerné ----
+    match /journal_entries/{id} {
+      allow read: if estAdminOuSuper() || (estConnecte() && resource.data.membreId == request.auth.uid);
+      allow create, update, delete: if estAdminOuSuper();
     }
 
     // ---- boutique_produits ----
