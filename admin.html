@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css">
+<link rel="stylesheet" href="assets/style.css?v=V08">
 </head>
 <body class="app-shell">
 
@@ -28,6 +28,8 @@
     <button class="tab-btn" data-tab="planning" onclick="activerOnglet('planning')">Planning</button>
     <button class="tab-btn" data-tab="compta" onclick="activerOnglet('compta')">Compta</button>
     <button class="tab-btn" data-tab="boutique" onclick="activerOnglet('boutique')">Boutique</button>
+    <button class="tab-btn" data-tab="blog" onclick="activerOnglet('blog')">Blog</button>
+    <button class="tab-btn" data-tab="livres" onclick="activerOnglet('livres')">Livres</button>
   </div>
 
   <section id="tab-membres" class="tab-panel active">
@@ -77,9 +79,25 @@
     </div>
     <div id="listeCommandes"></div>
   </section>
+
+  <section id="tab-blog" class="tab-panel">
+    <div class="toolbar">
+      <h2 style="margin:0;">Articles du blog</h2>
+      <button class="btn" onclick="ouvrirModalArticle()">+ Nouvel article</button>
+    </div>
+    <div id="listeArticles"></div>
+  </section>
+
+  <section id="tab-livres" class="tab-panel">
+    <div class="toolbar">
+      <h2 style="margin:0;">Livres</h2>
+      <button class="btn" onclick="ouvrirModalLivre()">+ Nouveau livre</button>
+    </div>
+    <div id="listeLivres"></div>
+  </section>
 </main>
 
-<footer><div class="container"><span class="small-muted">© <span id="an"></span> Céline Laruelle</span><span id="versionTag2" class="small-muted"></span></div></footer>
+<footer><div class="container"><span class="small-muted">© <span id="an"></span> Hélène Laruelle</span><span id="versionTag2" class="small-muted"></span></div></footer>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>

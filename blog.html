@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blog — Céline Laruelle</title>
+<meta name="description" content="Conseils, réflexions et actualités de Céline Laruelle, coach scolaire à Huy.">
+<link rel="stylesheet" href="assets/style.css?v=V08">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="container">
+    <a href="index.html" class="brand">Céline Laruelle</a>
+    <div class="nav-links">
+      <a href="qui-suis-je.html">Qui suis-je</a>
+      <a href="accompagnement.html">Accompagnement</a>
+      <a href="livres.html">Livres</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" class="btn-home">Espace membres →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" style="padding:60px 0 40px;">
+  <div class="container">
+    <span class="hero-eyebrow">Le blog</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Conseils &amp; réflexions</h1>
+    <p class="lead">Des articles autour de la scolarité, la méthode de travail et l'accompagnement des jeunes.</p>
+  </div>
+</header>
+
+<section>
+  <div class="container" style="max-width:760px;">
+    <div id="listeArticlesPublic"><p class="small-muted">Chargement...</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-top">
+    <div>
+      <strong>Céline Laruelle</strong><br>
+      Rue Vergiers 66, 4500 Huy — N° BCE 0797006834 (non assujettie TVA)
+    </div>
+    <div>
+      <a href="mentions-legales.html">Mentions légales</a> ·
+      <a href="rgpd.html">RGPD</a> ·
+      <a href="cgv.html">CGV</a>
+    </div>
+  </div>
+  <div class="container small-muted" style="margin-top:14px;">
+    © <span id="anneeCourante"></span> Hélène Laruelle. Tous droits réservés. Toute copie du site ou de son code est interdite.
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script>
+document.getElementById('anneeCourante').textContent = new Date().getFullYear();
+
+function echapperHtml(txt){
+  const d = document.createElement('div');
+  d.textContent = txt;
+  return d.innerHTML;
+}
+
+async function chargerArticlesPublics(){
+  const zone = document.getElementById('listeArticlesPublic');
+  try{
+    const snap = await db.collection('blog_articles').where('publie','==',true).orderBy('dateCreation','desc').get();
+    if(snap.empty){
+      zone.innerHTML = '<p class="small-muted">Aucun article publié pour le moment. Reviens bientôt !</p>';
+      return;
+    }
+    let html = '';
+    snap.forEach(doc => {
+      const a = doc.data();
+      html += `<article class="card mt-24">
+        <p class="small-muted" style="margin-bottom:4px;">${a.dateAffichage || ''}</p>
+        <h2 style="font-size:1.5rem;">${echapperHtml(a.titre)}</h2>
+        <p style="white-space:pre-line;">${echapperHtml(a.contenu)}</p>
+      </article>`;
+    });
+    zone.innerHTML = html;
+  }catch(err){
+    zone.innerHTML = '<div class="alert alert-error">Impossible de charger les articles pour le moment. Réessaie dans un instant.</div>';
+  }
+}
+chargerArticlesPublics();
+</script>
+</body>
+</html>

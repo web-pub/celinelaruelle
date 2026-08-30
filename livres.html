@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Livres — Céline Laruelle</title>
+<meta name="description" content="Le livre de Céline Laruelle, coach scolaire, pour accompagner les jeunes et leurs familles.">
+<link rel="stylesheet" href="assets/style.css?v=V08">
+</head>
+<body>
+
+<nav class="site-nav">
+  <div class="container">
+    <a href="index.html" class="brand">Céline Laruelle</a>
+    <div class="nav-links">
+      <a href="qui-suis-je.html">Qui suis-je</a>
+      <a href="accompagnement.html">Accompagnement</a>
+      <a href="livres.html">Livres</a>
+      <a href="blog.html">Blog</a>
+      <a href="contact.html">Contact</a>
+      <a href="login.html" class="btn-home">Espace membres →</a>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" style="padding:60px 0 20px;">
+  <div class="container text-center">
+    <span class="hero-eyebrow">À paraître</span>
+    <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Mon livre</h1>
+    <p class="lead" style="margin:0 auto;">Le fruit de 18 ans d'expérience de terrain, pour outiller aussi les parents à la maison.</p>
+  </div>
+</header>
+
+<section>
+  <div class="container" style="max-width:820px;">
+    <div id="listeLivresPublic"><p class="small-muted">Chargement...</p></div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-top">
+    <div>
+      <strong>Céline Laruelle</strong><br>
+      Rue Vergiers 66, 4500 Huy — N° BCE 0797006834 (non assujettie TVA)
+    </div>
+    <div>
+      <a href="mentions-legales.html">Mentions légales</a> ·
+      <a href="rgpd.html">RGPD</a> ·
+      <a href="cgv.html">CGV</a>
+    </div>
+  </div>
+  <div class="container small-muted" style="margin-top:14px;">
+    © <span id="anneeCourante"></span> Hélène Laruelle. Tous droits réservés. Toute copie du site ou de son code est interdite.
+  </div>
+</footer>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script>
+document.getElementById('anneeCourante').textContent = new Date().getFullYear();
+
+function echapperHtmlLivre(txt){
+  const d = document.createElement('div');
+  d.textContent = txt || '';
+  return d.innerHTML;
+}
+
+async function chargerLivresPublics(){
+  const zone = document.getElementById('listeLivresPublic');
+  try{
+    const snap = await db.collection('livres').where('publie','==',true).orderBy('dateCreation','desc').get();
+    if(snap.empty){
+      zone.innerHTML = '<p class="small-muted text-center">Le livre est en préparation — reviens bientôt pour en savoir plus !</p>';
+      return;
+    }
+    let html = '';
+    snap.forEach(doc => {
+      const l = doc.data();
+      const statutLabel = { bientot:'Bientôt disponible', precommande:'Précommande ouverte', disponible:'Disponible' }[l.statut] || l.statut;
+      html += `<div class="card mt-24">
+        <span class="pill pill-valide" style="margin-bottom:12px; display:inline-block;">${statutLabel}</span>
+        <h2 style="font-size:1.5rem;">${echapperHtmlLivre(l.titre)}</h2>
+        <p style="white-space:pre-line;">${echapperHtmlLivre(l.description)}</p>
+        ${l.prix ? `<p><strong>${l.prix} €</strong></p>` : ''}
+        <a href="contact.html" class="btn mt-24">Être prévenu(e) / précommander</a>
+      </div>`;
+    });
+    zone.innerHTML = html;
+  }catch(err){
+    zone.innerHTML = '<div class="alert alert-error">Impossible de charger les informations pour le moment. Réessaie dans un instant.</div>';
+  }
+}
+chargerLivresPublics();
+</script>
+</body>
+</html>

@@ -1,13 +1,14 @@
 # Site Céline Laruelle — Coach scolaire
 
-Version : **celinelaruelle V03**
+Version : **celinelaruelle V08**
 Projet Firebase : **celinelaruellecoach** — Dépôt GitHub : **celinelaruelle**
 
 Structure volontairement plate (aucun sous-dossier, à part `assets/` qui contient tout directement) :
 ```
-index.html, login.html, inscription.html, admin.html, super.html, membre.html,
+index.html (accueil vitrine), qui-suis-je.html, accompagnement.html, livres.html, blog.html, contact.html,
+login.html, inscription.html, admin.html, super.html, membre.html,
 mentions-legales.html, rgpd.html, cgv.html, firestore.rules, README.md
-assets/style.css
+assets/style.css, assets/celine-photo.jpg
 assets/firebase-config.js, version.js, auth.js, dashboard-common.js, vault.js, membre.js
 ```
 
@@ -125,6 +126,25 @@ Une fois connectée, HeleneL peut ajouter d'autres admins/membres directement de
 | membreId, membreNom, produitId, produitNom, quantite | — | commande |
 | statut | string | `en_attente`, à faire évoluer manuellement dans Firestore |
 | date | string | date de commande |
+
+### `livres`
+| Champ | Type | Description |
+|---|---|---|
+| titre, description | string | présentation du livre |
+| statut | string | `bientot` \| `precommande` \| `disponible` |
+| prix | number/null | prix affiché si défini |
+| publie | boolean | `true` = visible sur la page publique `livres.html` |
+| dateCreation | timestamp | pour le tri |
+
+### `blog_articles`
+| Champ | Type | Description |
+|---|---|---|
+| titre, contenu | string | contenu de l'article |
+| publie | boolean | `true` = visible sur la page publique `blog.html` |
+| dateAffichage | string | date lisible affichée sur le blog |
+| dateCreation | timestamp | pour le tri |
+
+⚠️ La première fois que la page `blog.html` charge les articles publiés, Firestore peut demander de créer un **index composite** (champ `publie` + tri par `dateCreation`) : un lien apparaît directement dans la console du navigateur (F12) pour le créer en un clic.
 
 ### `demandes_inscription`
 | Champ | Type | Description |
