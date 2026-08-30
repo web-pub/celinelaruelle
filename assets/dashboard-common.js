@@ -166,7 +166,8 @@ function ouvrirModalAjoutMembre(){
     <label>Email</label><input id="am_email" type="email">
     <label>Téléphone</label><input id="am_telephone">
     <label>Identifiant</label><input id="am_username">
-    <label>Mot de passe (6 caractères min., sans caractère spécial)</label><input id="am_motdepasse" type="text">
+    <label>Mot de passe (6 caractères min., sans caractère spécial)</label>
+    <input id="am_motdepasse" type="text">
     <div class="text-center mt-24">
       <button class="btn" onclick="creerMembreManuel()">Créer le membre</button>
       <button class="btn btn-outline" onclick="fermerModal()">Annuler</button>
@@ -409,6 +410,157 @@ async function supprimerProduit(id){
   chargerBoutique();
 }
 
+/* ---------------------- ONGLET BLOG ---------------------- */
+async function chargerBlog(){
+  const zone = document.getElementById('listeArticles');
+  if(!zone) return;
+  zone.innerHTML = '<p class="small-muted">Chargement...</p>';
+  const snap = await db.collection('blog_articles').orderBy('dateCreation','desc').get();
+  if(snap.empty){ zone.innerHTML = '<p class="small-muted">Aucun article pour le moment.</p>'; return; }
+  let rows = '';
+  snap.forEach(doc => {
+    const a = doc.data();
+    rows += `<tr>
+      <td>${a.titre}</td>
+      <td>${a.publie ? '<span class="pill pill-valide">Publié</span>' : '<span class="pill pill-attente">Brouillon</span>'}</td>
+      <td>${a.dateAffichage || '—'}</td>
+      <td>
+        <button class="btn btn-sm btn-outline" onclick="ouvrirModalArticle('${doc.id}')">Modifier</button>
+        <button class="btn btn-sm" onclick="basculerPublicationArticle('${doc.id}', ${!a.publie})">${a.publie ? 'Dépublier' : 'Publier'}</button>
+        <button class="btn btn-sm btn-danger" onclick="supprimerArticle('${doc.id}')">Supprimer</button>
+      </td>
+    </tr>`;
+  });
+  zone.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Titre</th><th>Statut</th><th>Date</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+async function ouvrirModalArticle(articleId){
+  let a = { titre:'', contenu:'' };
+  if(articleId){
+    const snap = await db.collection('blog_articles').doc(articleId).get();
+    a = snap.data();
+  }
+  ouvrirModal(`
+    <h2>${articleId ? 'Modifier' : 'Nouvel'} article</h2>
+    <div id="alerteModal" class="alert alert-error hidden"></div>
+    <label>Titre</label><input id="bl_titre" value="${(a.titre||'').replace(/"/g,'&quot;')}">
+    <label>Contenu</label><textarea id="bl_contenu" rows="8">${a.contenu||''}</textarea>
+    <div class="text-center mt-24">
+      <button class="btn" onclick="enregistrerArticle('${articleId||''}')">Enregistrer</button>
+      <button class="btn btn-outline" onclick="fermerModal()">Annuler</button>
+    </div>
+  `);
+}
+
+async function enregistrerArticle(articleId){
+  const titre = document.getElementById('bl_titre').value.trim();
+  const contenu = document.getElementById('bl_contenu').value.trim();
+  if(!titre || !contenu){ afficherAlerte('alerteModal', "Merci de compléter le titre et le contenu."); return; }
+  const dateAffichage = new Date().toLocaleDateString('fr-BE');
+  if(articleId){
+    await db.collection('blog_articles').doc(articleId).update({ titre, contenu });
+  }else{
+    await db.collection('blog_articles').add({
+      titre, contenu, publie:false, dateAffichage,
+      dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+  fermerModal();
+  chargerBlog();
+}
+
+async function basculerPublicationArticle(articleId, publie){
+  await db.collection('blog_articles').doc(articleId).update({ publie });
+  chargerBlog();
+}
+
+async function supprimerArticle(articleId){
+  if(!confirm("Supprimer définitivement cet article ?")) return;
+  await db.collection('blog_articles').doc(articleId).delete();
+  chargerBlog();
+}
+
+/* ---------------------- ONGLET LIVRES ---------------------- */
+async function chargerLivres(){
+  const zone = document.getElementById('listeLivres');
+  if(!zone) return;
+  zone.innerHTML = '<p class="small-muted">Chargement...</p>';
+  const snap = await db.collection('livres').orderBy('dateCreation','desc').get();
+  if(snap.empty){ zone.innerHTML = '<p class="small-muted">Aucun livre pour le moment.</p>'; return; }
+  const statutLabel = { bientot:'Bientôt disponible', precommande:'Précommande ouverte', disponible:'Disponible' };
+  let rows = '';
+  snap.forEach(doc => {
+    const l = doc.data();
+    rows += `<tr>
+      <td>${l.titre}</td>
+      <td>${statutLabel[l.statut] || l.statut}</td>
+      <td>${l.prix ? l.prix + ' €' : '—'}</td>
+      <td>${l.publie ? '<span class="pill pill-valide">Publié</span>' : '<span class="pill pill-attente">Brouillon</span>'}</td>
+      <td>
+        <button class="btn btn-sm btn-outline" onclick="ouvrirModalLivre('${doc.id}')">Modifier</button>
+        <button class="btn btn-sm" onclick="basculerPublicationLivre('${doc.id}', ${!l.publie})">${l.publie ? 'Dépublier' : 'Publier'}</button>
+        <button class="btn btn-sm btn-danger" onclick="supprimerLivre('${doc.id}')">Supprimer</button>
+      </td>
+    </tr>`;
+  });
+  zone.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Titre</th><th>Statut</th><th>Prix</th><th>Publication</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+async function ouvrirModalLivre(livreId){
+  let l = { titre:'', description:'', statut:'bientot', prix:'' };
+  if(livreId){
+    const snap = await db.collection('livres').doc(livreId).get();
+    l = snap.data();
+  }
+  ouvrirModal(`
+    <h2>${livreId ? 'Modifier' : 'Nouveau'} livre</h2>
+    <div id="alerteModal" class="alert alert-error hidden"></div>
+    <label>Titre</label><input id="lv_titre" value="${(l.titre||'').replace(/"/g,'&quot;')}">
+    <label>Description</label><textarea id="lv_description" rows="6">${l.description||''}</textarea>
+    <label>Statut</label>
+    <select id="lv_statut">
+      <option value="bientot" ${l.statut==='bientot'?'selected':''}>Bientôt disponible</option>
+      <option value="precommande" ${l.statut==='precommande'?'selected':''}>Précommande ouverte</option>
+      <option value="disponible" ${l.statut==='disponible'?'selected':''}>Disponible</option>
+    </select>
+    <label>Prix (€, optionnel)</label><input id="lv_prix" type="number" step="0.01" value="${l.prix||''}">
+    <div class="text-center mt-24">
+      <button class="btn" onclick="enregistrerLivre('${livreId||''}')">Enregistrer</button>
+      <button class="btn btn-outline" onclick="fermerModal()">Annuler</button>
+    </div>
+  `);
+}
+
+async function enregistrerLivre(livreId){
+  const titre = document.getElementById('lv_titre').value.trim();
+  const description = document.getElementById('lv_description').value.trim();
+  const statut = document.getElementById('lv_statut').value;
+  const prixVal = document.getElementById('lv_prix').value;
+  const prix = prixVal ? parseFloat(prixVal) : null;
+  if(!titre || !description){ afficherAlerte('alerteModal', "Merci de compléter le titre et la description."); return; }
+  if(livreId){
+    await db.collection('livres').doc(livreId).update({ titre, description, statut, prix });
+  }else{
+    await db.collection('livres').add({
+      titre, description, statut, prix, publie:false,
+      dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+    });
+  }
+  fermerModal();
+  chargerLivres();
+}
+
+async function basculerPublicationLivre(livreId, publie){
+  await db.collection('livres').doc(livreId).update({ publie });
+  chargerLivres();
+}
+
+async function supprimerLivre(livreId){
+  if(!confirm("Supprimer définitivement ce livre ?")) return;
+  await db.collection('livres').doc(livreId).delete();
+  chargerLivres();
+}
+
 /* ---------------------- ONGLETS (navigation) ---------------------- */
 function activerOnglet(nom){
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === nom));
@@ -417,5 +569,7 @@ function activerOnglet(nom){
   if(nom === 'planning') chargerPlanning();
   if(nom === 'compta') chargerCompta();
   if(nom === 'boutique') chargerBoutique();
+  if(nom === 'blog') chargerBlog();
+  if(nom === 'livres') chargerLivres();
   if(nom === 'motsdepasse' && typeof chargerVault === 'function') chargerVault();
 }
