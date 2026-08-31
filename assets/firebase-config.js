@@ -23,8 +23,10 @@ const firebaseConfig = {
 const PROJECT_REF = "celinelaruellecoach";
 
 firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
 const db = firebase.firestore();
+/* auth n'est initialisé que si le SDK Firebase Auth est chargé sur la page
+   (pages publiques comme blog.html/livres.html n'en ont pas besoin). */
+const auth = firebase.auth ? firebase.auth() : null;
 
 /* Domaine fictif utilisé pour générer un email technique à partir d'un
    simple identifiant (les membres/admin se connectent en "identifiant + mot
