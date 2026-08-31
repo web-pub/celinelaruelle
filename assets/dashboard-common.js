@@ -220,11 +220,13 @@ async function creerEnfantAdmin(membreId){
 async function chargerJournalEnfant(enfantId, containerId){
   const zone = document.getElementById(containerId);
   if(!zone) return;
-  const snap = await db.collection('journal_entries').where('enfantId','==',enfantId).orderBy('dateCreation','desc').get();
+  const snap = await db.collection('journal_entries').where('enfantId','==',enfantId).get();
   if(snap.empty){ zone.innerHTML = '<p class="small-muted">Aucune entrée pour le moment.</p>'; return; }
+  const entrees = snap.docs
+    .map(doc => doc.data())
+    .sort((a, b) => (b.dateCreation?.toMillis?.() || 0) - (a.dateCreation?.toMillis?.() || 0));
   let html = '<div class="journal-timeline">';
-  snap.forEach(doc => {
-    const j = doc.data();
+  entrees.forEach(j => {
     html += `<div class="journal-entry">
       <div class="journal-entry-head">
         <span class="pill pill-categorie">${j.categorie}</span>
