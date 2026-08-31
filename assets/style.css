@@ -87,6 +87,12 @@ img{max-width:100%; display:block;}
 .btn-danger:hover{background:#8a372e; border-color:#8a372e;}
 .btn:disabled{opacity:.5; cursor:not-allowed;}
 
+.cta-group{display:flex; flex-wrap:wrap; gap:12px; align-items:center;}
+@media(max-width:480px){
+  .btn{padding:9px 18px; font-size:.72rem; letter-spacing:.4px;}
+  .cta-group{gap:8px;}
+}
+
 /* ---------- Hero ---------- */
 .hero{
   position:relative; padding:90px 0 70px; overflow:hidden;
