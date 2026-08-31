@@ -50,6 +50,7 @@ p{color:var(--brown-mid);}
 img{max-width:100%; display:block;}
 
 .container{max-width:1120px; margin:0 auto; padding:0 24px;}
+.container-wide{max-width:1440px; margin:0 auto; padding:0 32px;}
 
 /* ---------- Navigation ---------- */
 .site-nav{
@@ -200,12 +201,12 @@ input:focus, select:focus, textarea:focus{outline:2px solid var(--gold); outline
 .app-shell{min-height:100vh; display:flex; flex-direction:column;}
 .app-header{
   background:var(--brown-dark); color:var(--cream-light);
-  padding:14px 0; display:flex; align-items:center;
+  padding:14px 0;
 }
-.app-header .container{display:flex; align-items:center; justify-content:space-between;}
+.app-header .container, .app-header .container-wide{display:flex; align-items:center; justify-content:space-between; width:100%;}
 .app-header .brand{color:var(--cream-light); display:block; line-height:1.2;}
 .app-header-left{display:flex; flex-direction:column; gap:4px;}
-.app-header-meta{display:flex; align-items:center; gap:8px;}
+.app-header-meta{display:flex; align-items:center; gap:12px;}
 .app-header-right{display:flex; align-items:center; gap:10px;}
 .icon-btn{
   display:inline-flex; align-items:center; justify-content:center;

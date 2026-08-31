@@ -743,34 +743,6 @@ async function supprimerLivre(livreId){
   chargerLivres();
 }
 
-/* ---- Précommandes reçues sur la page publique Livres ---- */
-async function chargerPrecommandesLivres(){
-  const zone = document.getElementById('listePrecommandes');
-  if(!zone) return;
-  zone.innerHTML = '<p class="small-muted">Chargement...</p>';
-  const snap = await db.collection('precommandes_livres').orderBy('dateCreation','desc').get();
-  if(snap.empty){ zone.innerHTML = '<p class="small-muted">Aucune précommande reçue pour le moment.</p>'; return; }
-  let rows = '';
-  snap.forEach(doc => {
-    const p = doc.data();
-    rows += `<tr>
-      <td>${p.dateAffichage}</td>
-      <td>${p.prenom} ${p.nom}</td>
-      <td>${p.email}${p.telephone ? '<br>'+p.telephone : ''}</td>
-      <td>${p.titre}</td>
-      <td>${p.quantite}</td>
-      <td>${p.statut === 'traitee' ? '<span class="pill pill-valide">Traitée</span>' : '<span class="pill pill-attente">Nouvelle</span>'}</td>
-      <td>${p.statut !== 'traitee' ? `<button class="btn btn-sm" onclick="marquerPrecommandeTraitee('${doc.id}')">Marquer traitée</button>` : ''}</td>
-    </tr>`;
-  });
-  zone.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Nom</th><th>Contact</th><th>Livre</th><th>Qté</th><th>Statut</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
-}
-
-async function marquerPrecommandeTraitee(id){
-  await db.collection('precommandes_livres').doc(id).update({ statut: 'traitee' });
-  chargerPrecommandesLivres();
-}
-
 /* ---- P&L simplifié ---- */
 async function calculerPL(){
   const zone = document.getElementById('resultatPL');
@@ -910,7 +882,7 @@ function activerOnglet(nom){
   if(nom === 'compta') chargerCompta();
   if(nom === 'boutique') chargerBoutique();
   if(nom === 'blog') chargerBlog();
-  if(nom === 'livres'){ chargerLivres(); chargerPrecommandesLivres(); }
+  if(nom === 'livres'){ chargerLivres(); }
   if(nom === 'contenu') chargerContenuSite();
   if(nom === 'motsdepasse' && typeof chargerVault === 'function') chargerVault();
 }
