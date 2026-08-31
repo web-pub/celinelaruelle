@@ -137,15 +137,65 @@ async function voirFicheMembre(membreId){
     }
   }
   ouvrirModal(`
-    <h2>${m.prenom} ${m.nom}</h2>
-    <p class="small-muted">${m.email} · ${m.telephone}</p>
-    <p class="small-muted">Identifiant : ${m.username} · Dernière connexion : ${formatDate(m.derniereConnexion)}</p>
+    <h2>Fiche membre</h2>
+    <div id="alerteFicheAdmin" class="alert alert-error hidden"></div>
+    <label>Nom <span class="req">*</span></label><input id="fa_nom" value="${(m.nom||'').replace(/"/g,'&quot;')}">
+    <label>Prénom <span class="req">*</span></label><input id="fa_prenom" value="${(m.prenom||'').replace(/"/g,'&quot;')}">
+    <label>Email <span class="req">*</span></label><input id="fa_email" type="email" value="${(m.email||'').replace(/"/g,'&quot;')}">
+    <label>Téléphone</label><input id="fa_telephone" value="${(m.telephone||'').replace(/"/g,'&quot;')}">
+    <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
+    <button class="btn btn-sm mt-24" onclick="enregistrerFicheAdmin('${membreId}')">Enregistrer la fiche</button>
+    <p class="small-muted mt-24">Identifiant : ${m.username} · Dernière connexion : ${formatDate(m.derniereConnexion)}</p>
     <div class="divider"></div>
-    <h3>Enfants</h3>
+    <div class="toolbar">
+      <h3 style="margin:0;">Enfants</h3>
+      <button class="btn btn-sm" onclick="ouvrirModalAjoutEnfantAdmin('${membreId}')">+ Ajouter un enfant</button>
+    </div>
     ${enfantsHtml}
     <div class="text-center mt-24"><button class="btn btn-outline" onclick="fermerModal()">Fermer</button></div>
   `);
   enfantsSnap.forEach(doc => chargerJournalEnfant(doc.id, 'journal_' + doc.id));
+}
+
+async function enregistrerFicheAdmin(membreId){
+  const nom = document.getElementById('fa_nom').value.trim();
+  const prenom = document.getElementById('fa_prenom').value.trim();
+  const email = document.getElementById('fa_email').value.trim();
+  const telephone = document.getElementById('fa_telephone').value.trim();
+  if(!nom || !prenom || !email){ afficherAlerte('alerteFicheAdmin', "Nom, prénom et email sont obligatoires."); return; }
+  await db.collection('membres').doc(membreId).update({ nom, prenom, email, telephone });
+  fermerModal();
+  voirFicheMembre(membreId);
+  chargerMembres();
+}
+
+function ouvrirModalAjoutEnfantAdmin(membreId){
+  ouvrirModal(`
+    <h2>Ajouter un enfant</h2>
+    <div id="alerteModal" class="alert alert-error hidden"></div>
+    <label>Nom <span class="req">*</span></label><input id="ea_nom">
+    <label>Prénom <span class="req">*</span></label><input id="ea_prenom">
+    <label>Date de naissance</label><input id="ea_naissance" type="date">
+    <label>École</label><input id="ea_ecole">
+    <label>Classe</label><input id="ea_classe">
+    <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
+    <div class="text-center mt-24">
+      <button class="btn" onclick="creerEnfantAdmin('${membreId}')">Ajouter</button>
+      <button class="btn btn-outline" onclick="fermerModal(); voirFicheMembre('${membreId}');">Annuler</button>
+    </div>
+  `);
+}
+
+async function creerEnfantAdmin(membreId){
+  const nom = document.getElementById('ea_nom').value.trim();
+  const prenom = document.getElementById('ea_prenom').value.trim();
+  const dateNaissance = document.getElementById('ea_naissance').value;
+  const ecole = document.getElementById('ea_ecole').value.trim();
+  const classe = document.getElementById('ea_classe').value.trim();
+  if(!nom || !prenom){ afficherAlerte('alerteModal', "Nom et prénom sont obligatoires."); return; }
+  await db.collection('enfants').add({ membreId, nom, prenom, dateNaissance, ecole, classe });
+  fermerModal();
+  voirFicheMembre(membreId);
 }
 
 async function chargerJournalEnfant(enfantId, containerId){
@@ -201,16 +251,17 @@ function ouvrirModalAjoutMembre(){
   ouvrirModal(`
     <h2>Ajouter un membre</h2>
     <div id="alerteModal" class="alert alert-error hidden"></div>
-    <label>Nom</label><input id="am_nom">
-    <label>Prénom</label><input id="am_prenom">
-    <label>Email</label><input id="am_email" type="email">
+    <label>Nom <span class="req">*</span></label><input id="am_nom">
+    <label>Prénom <span class="req">*</span></label><input id="am_prenom">
+    <label>Email <span class="req">*</span></label><input id="am_email" type="email">
     <label>Téléphone</label><input id="am_telephone">
-    <label>Identifiant</label><input id="am_username">
-    <label>Mot de passe (6 caractères min., sans caractère spécial)</label>
+    <label>Identifiant <span class="req">*</span></label><input id="am_username">
+    <label>Mot de passe (6 caractères min., sans caractère spécial) <span class="req">*</span></label>
     <div class="password-wrap">
       <input id="am_motdepasse" type="password">
       <button type="button" class="toggle-eye" onclick="togglePw('am_motdepasse', this)" aria-label="Afficher le mot de passe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
     </div>
+    <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
     <div class="text-center mt-24">
       <button class="btn" onclick="creerMembreManuel()">Créer le membre</button>
       <button class="btn btn-outline" onclick="fermerModal()">Annuler</button>
@@ -594,7 +645,7 @@ async function chargerLivres(){
   snap.forEach(doc => {
     const l = doc.data();
     rows += `<tr>
-      <td>${l.titre}</td>
+      <td>${l.titre}${l.code ? '<br><span class="small-muted">'+l.code+'</span>' : ''}</td>
       <td>${statutLabel[l.statut] || l.statut}</td>
       <td>${l.prix ? l.prix + ' €' : '—'}</td>
       <td>${l.publie ? '<span class="pill pill-valide">Publié</span>' : '<span class="pill pill-attente">Brouillon</span>'}</td>
@@ -609,7 +660,7 @@ async function chargerLivres(){
 }
 
 async function ouvrirModalLivre(livreId){
-  let l = { titre:'', description:'', statut:'bientot', prix:'' };
+  let l = { titre:'', description:'', statut:'bientot', prix:'', code:'', couverture:'assets/livre-cover.jpg' };
   if(livreId){
     const snap = await db.collection('livres').doc(livreId).get();
     l = snap.data();
@@ -626,6 +677,9 @@ async function ouvrirModalLivre(livreId){
       <option value="disponible" ${l.statut==='disponible'?'selected':''}>Disponible</option>
     </select>
     <label>Prix (€, optionnel)</label><input id="lv_prix" type="number" step="0.01" value="${l.prix||''}">
+    <label>Code du livre (ISBN ou référence interne)</label><input id="lv_code" value="${(l.code||'').replace(/"/g,'&quot;')}">
+    <label>Image de couverture (chemin dans assets/)</label><input id="lv_couverture" value="${l.couverture||'assets/livre-cover.jpg'}">
+    <p class="field-hint">Le fichier de couverture est déjà dans assets/livre-cover.jpg — laisse ce champ tel quel sauf si tu ajoutes une autre image.</p>
     <div class="text-center mt-24">
       <button class="btn" onclick="enregistrerLivre('${livreId||''}')">Enregistrer</button>
       <button class="btn btn-outline" onclick="fermerModal()">Annuler</button>
@@ -639,12 +693,14 @@ async function enregistrerLivre(livreId){
   const statut = document.getElementById('lv_statut').value;
   const prixVal = document.getElementById('lv_prix').value;
   const prix = prixVal ? parseFloat(prixVal) : null;
+  const code = document.getElementById('lv_code').value.trim();
+  const couverture = document.getElementById('lv_couverture').value.trim() || 'assets/livre-cover.jpg';
   if(!titre || !description){ afficherAlerte('alerteModal', "Merci de compléter le titre et la description."); return; }
   if(livreId){
-    await db.collection('livres').doc(livreId).update({ titre, description, statut, prix });
+    await db.collection('livres').doc(livreId).update({ titre, description, statut, prix, code, couverture });
   }else{
     await db.collection('livres').add({
-      titre, description, statut, prix, publie:false,
+      titre, description, statut, prix, code, couverture, publie:false,
       dateCreation: firebase.firestore.FieldValue.serverTimestamp()
     });
   }
@@ -714,6 +770,85 @@ function genererOptionsAnnees(){
   return options;
 }
 
+/* ---------------------- ONGLET CONTENU DU SITE ---------------------- */
+const CHAMPS_CONTENU = [
+  { section:'Accueil', champs:[
+    { cle:'accueil_eyebrow', label:'Accroche (au-dessus du titre)', type:'input' },
+    { cle:'accueil_lead', label:'Texte sous le titre', type:'textarea' },
+    { cle:'accueil_stat1_nombre', label:'Chiffre clé 1', type:'input' },
+    { cle:'accueil_stat1_texte', label:'Texte chiffre clé 1', type:'input' },
+    { cle:'accueil_stat2_nombre', label:'Chiffre clé 2', type:'input' },
+    { cle:'accueil_stat2_texte', label:'Texte chiffre clé 2', type:'input' },
+    { cle:'accueil_stat3_nombre', label:'Chiffre clé 3', type:'input' },
+    { cle:'accueil_stat3_texte', label:'Texte chiffre clé 3', type:'input' },
+    { cle:'accueil_citation', label:'Citation mise en avant', type:'textarea' },
+  ]},
+  { section:'Qui suis-je', champs:[
+    { cle:'qsj_intro', label:'Paragraphes d\'introduction (parcours)', type:'textarea', grand:true },
+    { cle:'qsj_vocation', label:'Section "Une vocation"', type:'textarea', grand:true },
+    { cle:'qsj_perso', label:'Section "Et côté perso ?"', type:'textarea', grand:true },
+    { cle:'qsj_citation', label:'Citation "Et côté perso"', type:'textarea' },
+    { cle:'qsj_footer', label:'Ligne récapitulative en bas de la carte', type:'input' },
+  ]},
+  { section:'Accompagnement', champs:[
+    { cle:'acc_service1_titre', label:'Titre service 1', type:'input' },
+    { cle:'acc_service1_texte', label:'Texte service 1', type:'textarea' },
+    { cle:'acc_service2_titre', label:'Titre service 2', type:'input' },
+    { cle:'acc_service2_texte', label:'Texte service 2', type:'textarea' },
+    { cle:'acc_service3_titre', label:'Titre service 3', type:'input' },
+    { cle:'acc_service3_texte', label:'Texte service 3', type:'textarea' },
+    { cle:'acc_pourqui', label:'Section "Pour qui ?"', type:'textarea', grand:true },
+  ]},
+  { section:'Contact', champs:[
+    { cle:'contact_lead', label:'Texte sous le titre de la page Contact', type:'textarea' },
+  ]},
+];
+
+async function chargerContenuSite(){
+  const zone = document.getElementById('listeContenu');
+  if(!zone) return;
+  zone.innerHTML = '<p class="small-muted">Chargement...</p>';
+
+  const snap = await db.collection('site_content').doc('global').get();
+  const data = snap.exists ? snap.data() : {};
+
+  let html = `<div id="alerteContenu" class="alert alert-error hidden"></div>
+    <p class="small-muted mb-24">Laisse un champ vide pour garder le texte par défaut du site. Ce contenu est visible sur les pages publiques dès l'enregistrement.</p>`;
+
+  CHAMPS_CONTENU.forEach(section => {
+    html += `<details class="settings-block mt-24" open><summary>${section.section}</summary><div class="mt-24">`;
+    section.champs.forEach(c => {
+      const val = (data[c.cle] || '').replace(/"/g,'&quot;');
+      if(c.type === 'input'){
+        html += `<label>${c.label}</label><input id="sc_${c.cle}" value="${val}">`;
+      }else{
+        html += `<label>${c.label}</label><textarea id="sc_${c.cle}" rows="${c.grand ? 6 : 3}">${data[c.cle] || ''}</textarea>`;
+      }
+    });
+    html += `</div></details>`;
+  });
+
+  html += `<div class="text-center mt-24"><button class="btn" onclick="enregistrerContenuSite()">Enregistrer le contenu</button></div>`;
+  zone.innerHTML = html;
+}
+
+async function enregistrerContenuSite(){
+  const donnees = {};
+  CHAMPS_CONTENU.forEach(section => {
+    section.champs.forEach(c => {
+      const el = document.getElementById('sc_' + c.cle);
+      if(el) donnees[c.cle] = el.value.trim();
+    });
+  });
+  try{
+    await db.collection('site_content').doc('global').set(donnees, { merge:true });
+    afficherAlerte('alerteContenu', "Contenu enregistré.", 'ok');
+    setTimeout(() => masquerAlerte('alerteContenu'), 3000);
+  }catch(err){
+    afficherAlerte('alerteContenu', traduireErreur(err));
+  }
+}
+
 /* ---------------------- ONGLETS (navigation) ---------------------- */
 function activerOnglet(nom){
   document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === nom));
@@ -724,5 +859,6 @@ function activerOnglet(nom){
   if(nom === 'boutique') chargerBoutique();
   if(nom === 'blog') chargerBlog();
   if(nom === 'livres') chargerLivres();
+  if(nom === 'contenu') chargerContenuSite();
   if(nom === 'motsdepasse' && typeof chargerVault === 'function') chargerVault();
 }

@@ -26,6 +26,7 @@ async function enregistrerFiche(){
   const prenom = document.getElementById('fichePrenom').value.trim();
   const email = document.getElementById('ficheEmail').value.trim();
   const telephone = document.getElementById('ficheTelephone').value.trim();
+  if(!nom || !prenom || !email){ afficherAlerte('alerteFiche', "Nom, prénom et email sont obligatoires."); return; }
   await db.collection('membres').doc(membreUid).update({ nom, prenom, email, telephone });
   afficherAlerte('alerteFiche', "Fiche mise à jour.", 'ok');
   setTimeout(() => masquerAlerte('alerteFiche'), 3000);
@@ -56,11 +57,12 @@ async function chargerEnfantsMembre(){
 function ouvrirModalAjoutEnfant(){
   ouvrirModal(`
     <h2>Ajouter un enfant</h2>
-    <label>Nom</label><input id="en_nom">
-    <label>Prénom</label><input id="en_prenom">
+    <label>Nom <span class="req">*</span></label><input id="en_nom">
+    <label>Prénom <span class="req">*</span></label><input id="en_prenom">
     <label>Date de naissance</label><input id="en_naissance" type="date">
     <label>École</label><input id="en_ecole">
     <label>Classe</label><input id="en_classe">
+    <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
     <div class="text-center mt-24">
       <button class="btn" onclick="creerEnfant()">Ajouter</button>
       <button class="btn btn-outline" onclick="fermerModal()">Annuler</button>

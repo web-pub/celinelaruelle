@@ -127,6 +127,10 @@ img{max-width:100%; display:block;}
 
 .carte-contact{border-top:3px solid var(--gold); align-self:start;}
 
+.livre-card{display:grid; grid-template-columns:180px 1fr; gap:24px; align-items:start;}
+.livre-cover{width:100%; border-radius:4px; box-shadow:var(--shadow);}
+@media(max-width:600px){.livre-card{grid-template-columns:1fr;} .livre-cover{max-width:200px; margin:0 auto;}}
+
 /* ---------- Sections ---------- */
 section{padding:64px 0;}
 .section-alt{background:var(--cream-light);}
@@ -162,6 +166,8 @@ footer a{color:var(--cream-shade);}
   box-shadow:var(--shadow);
 }
 label{display:block; font-size:.85rem; color:var(--brown-mid); margin:14px 0 6px;}
+.req{color:var(--error);}
+.note-obligatoire{font-size:.75rem; color:var(--taupe); margin-top:16px;}
 input, select, textarea{
   width:100%; padding:11px 14px; border:1px solid var(--taupe-soft);
   border-radius:8px; background:var(--cream-bg); font-family:var(--font-body);
