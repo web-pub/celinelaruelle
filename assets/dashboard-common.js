@@ -85,23 +85,42 @@ async function validerDemande(demandeId){
     const snap = await ref.get();
     const d = snap.data();
 
-    const uid = await creerCompteMembre(d.username, d.motdepasse, 'membre');
+    let username = d.username;
+    let motdepasse = d.motdepasse;
+
+    if(!username || !motdepasse){
+      while(true){
+        username = prompt("Cette demande vient de la mini fiche \"Devenir membre\" : choisis un identifiant pour " + d.prenom + " " + d.nom + " (lettres et chiffres uniquement) :");
+        if(username === null) return;
+        username = username.trim();
+        if(username && !/[^a-zA-Z0-9]/.test(username)) break;
+        alert("Identifiant invalide : lettres et chiffres uniquement, sans espace.");
+      }
+      while(true){
+        motdepasse = prompt("Choisis un mot de passe pour " + username + " (6 caractères min., lettres et chiffres uniquement) :");
+        if(motdepasse === null) return;
+        if(motdepasse.length >= 6 && !/[^a-zA-Z0-9]/.test(motdepasse)) break;
+        alert("Mot de passe invalide : 6 caractères minimum, sans caractère spécial.");
+      }
+    }
+
+    const uid = await creerCompteMembre(username, motdepasse, 'membre');
 
     await db.collection('users').doc(uid).set({
-      username: d.username, role: 'membre', email: d.email,
+      username: username, role: 'membre', email: d.email,
       derniereConnexion: null, dateCreation: firebase.firestore.FieldValue.serverTimestamp()
     });
     await db.collection('passwords_vault').doc(uid).set({
-      nom: d.nom, prenom: d.prenom, username: d.username, motdepasse: d.motdepasse,
+      nom: d.nom, prenom: d.prenom, username: username, motdepasse: motdepasse,
       role: 'membre', derniereConnexion: null
     });
     await db.collection('membres').doc(uid).set({
       nom: d.nom, prenom: d.prenom, email: d.email, telephone: d.telephone,
-      username: d.username, raisonInitiale: d.raison || '', enfants: [],
+      username: username, raisonInitiale: d.raison || '', enfants: [],
       derniereConnexion: null, dateCreation: firebase.firestore.FieldValue.serverTimestamp()
     });
     await ref.update({ statut: 'valide' });
-    alert("Compte membre créé. Identifiant : " + d.username);
+    alert("Compte membre créé. Identifiant : " + username);
     chargerMembres();
   }catch(err){
     alert(traduireErreur(err));
@@ -256,6 +275,7 @@ function ouvrirModalAjoutMembre(){
     <label>Email <span class="req">*</span></label><input id="am_email" type="email">
     <label>Téléphone</label><input id="am_telephone">
     <label>Identifiant <span class="req">*</span></label><input id="am_username">
+    <p class="field-hint">Uniquement lettres et chiffres, sans caractère spécial.</p>
     <label>Mot de passe (6 caractères min., sans caractère spécial) <span class="req">*</span></label>
     <div class="password-wrap">
       <input id="am_motdepasse" type="password">
@@ -279,6 +299,10 @@ async function creerMembreManuel(){
 
   if(!nom || !prenom || !email || !username || motdepasse.length < 6 || /[^a-zA-Z0-9]/.test(motdepasse)){
     afficherAlerte('alerteModal', "Vérifie les champs : mot de passe 6 caractères min., sans caractère spécial.");
+    return;
+  }
+  if(/[^a-zA-Z0-9]/.test(username)){
+    afficherAlerte('alerteModal', "L'identifiant ne peut contenir que des lettres et des chiffres, sans caractère spécial.");
     return;
   }
   try{
@@ -677,7 +701,7 @@ async function ouvrirModalLivre(livreId){
       <option value="disponible" ${l.statut==='disponible'?'selected':''}>Disponible</option>
     </select>
     <label>Prix (€, optionnel)</label><input id="lv_prix" type="number" step="0.01" value="${l.prix||''}">
-    <label>Code du livre (ISBN ou référence interne)</label><input id="lv_code" value="${(l.code||'').replace(/"/g,'&quot;')}">
+    <label>Code ISBN (ou référence interne)</label><input id="lv_code" value="${(l.code||'').replace(/"/g,'&quot;')}">
     <label>Image de couverture (chemin dans assets/)</label><input id="lv_couverture" value="${l.couverture||'assets/livre-cover.jpg'}">
     <p class="field-hint">Le fichier de couverture est déjà dans assets/livre-cover.jpg — laisse ce champ tel quel sauf si tu ajoutes une autre image.</p>
     <div class="text-center mt-24">
@@ -717,6 +741,34 @@ async function supprimerLivre(livreId){
   if(!confirm("Supprimer définitivement ce livre ?")) return;
   await db.collection('livres').doc(livreId).delete();
   chargerLivres();
+}
+
+/* ---- Précommandes reçues sur la page publique Livres ---- */
+async function chargerPrecommandesLivres(){
+  const zone = document.getElementById('listePrecommandes');
+  if(!zone) return;
+  zone.innerHTML = '<p class="small-muted">Chargement...</p>';
+  const snap = await db.collection('precommandes_livres').orderBy('dateCreation','desc').get();
+  if(snap.empty){ zone.innerHTML = '<p class="small-muted">Aucune précommande reçue pour le moment.</p>'; return; }
+  let rows = '';
+  snap.forEach(doc => {
+    const p = doc.data();
+    rows += `<tr>
+      <td>${p.dateAffichage}</td>
+      <td>${p.prenom} ${p.nom}</td>
+      <td>${p.email}${p.telephone ? '<br>'+p.telephone : ''}</td>
+      <td>${p.titre}</td>
+      <td>${p.quantite}</td>
+      <td>${p.statut === 'traitee' ? '<span class="pill pill-valide">Traitée</span>' : '<span class="pill pill-attente">Nouvelle</span>'}</td>
+      <td>${p.statut !== 'traitee' ? `<button class="btn btn-sm" onclick="marquerPrecommandeTraitee('${doc.id}')">Marquer traitée</button>` : ''}</td>
+    </tr>`;
+  });
+  zone.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Date</th><th>Nom</th><th>Contact</th><th>Livre</th><th>Qté</th><th>Statut</th><th></th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+
+async function marquerPrecommandeTraitee(id){
+  await db.collection('precommandes_livres').doc(id).update({ statut: 'traitee' });
+  chargerPrecommandesLivres();
 }
 
 /* ---- P&L simplifié ---- */
@@ -858,7 +910,7 @@ function activerOnglet(nom){
   if(nom === 'compta') chargerCompta();
   if(nom === 'boutique') chargerBoutique();
   if(nom === 'blog') chargerBlog();
-  if(nom === 'livres') chargerLivres();
+  if(nom === 'livres'){ chargerLivres(); chargerPrecommandesLivres(); }
   if(nom === 'contenu') chargerContenuSite();
   if(nom === 'motsdepasse' && typeof chargerVault === 'function') chargerVault();
 }

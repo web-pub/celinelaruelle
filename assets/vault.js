@@ -23,7 +23,7 @@ async function chargerVault(){
       <td>${v.username}</td>
       <td>
         <span class="mdp-cell" data-mdp="${(v.motdepasse||'').replace(/"/g,'&quot;')}">••••••••</span>
-        <button type="button" class="toggle-eye" style="padding:4px;" onclick="basculerUneLigneMdp(this)" aria-label="Afficher le mot de passe">${OEIL_OUVERT}</button>
+        <button type="button" class="toggle-eye-inline" onclick="basculerUneLigneMdp(this)" aria-label="Afficher le mot de passe">${OEIL_OUVERT}</button>
       </td>
       <td>${v.role}</td>
       <td>${formatDate(v.derniereConnexion)}</td>

@@ -183,6 +183,13 @@ input:focus, select:focus, textarea:focus{outline:2px solid var(--gold); outline
 }
 .toggle-eye:hover{color:var(--brown-dark);}
 .toggle-eye svg{width:18px; height:18px;}
+.toggle-eye-inline{
+  display:inline-flex; align-items:center; vertical-align:middle;
+  background:none; border:none; cursor:pointer; padding:4px;
+  color:var(--taupe); margin-left:6px;
+}
+.toggle-eye-inline:hover{color:var(--brown-dark);}
+.toggle-eye-inline svg{width:16px; height:16px;}
 .field-hint{font-size:.75rem; color:var(--taupe); margin-top:4px;}
 
 .alert{padding:12px 16px; border-radius:8px; font-size:.88rem; margin:16px 0;}
@@ -196,10 +203,20 @@ input:focus, select:focus, textarea:focus{outline:2px solid var(--gold); outline
   padding:14px 0; display:flex; align-items:center;
 }
 .app-header .container{display:flex; align-items:center; justify-content:space-between;}
-.app-header .brand{color:var(--cream-light);}
+.app-header .brand{color:var(--cream-light); display:block; line-height:1.2;}
+.app-header-left{display:flex; flex-direction:column; gap:4px;}
+.app-header-meta{display:flex; align-items:center; gap:8px;}
+.app-header-right{display:flex; align-items:center; gap:10px;}
+.icon-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:36px; height:36px; border-radius:50%;
+  border:1px solid rgba(255,255,255,.4); color:#fff; background:none;
+}
+.icon-btn svg{width:17px; height:17px;}
+.icon-btn:hover{background:rgba(255,255,255,.1);}
 .app-badge{
   font-size:.7rem; text-transform:uppercase; letter-spacing:1px;
-  background:var(--gold); color:var(--brown-dark); padding:3px 10px; border-radius:20px; margin-left:10px;
+  background:var(--gold); color:var(--brown-dark); padding:3px 10px; border-radius:20px;
 }
 .version-tag{font-size:.72rem; color:var(--taupe-soft);}
 
