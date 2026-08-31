@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Demande d'accompagnement — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V10">
+<link rel="stylesheet" href="assets/style.css?v=V12">
 </head>
 <body>
 <nav class="site-nav">
@@ -23,22 +23,23 @@
       <div id="succes" class="alert alert-ok hidden"></div>
 
       <div id="formulaire">
-        <label>Nom</label><input type="text" id="nom">
-        <label>Prénom</label><input type="text" id="prenom">
-        <label>Adresse e-mail</label><input type="email" id="email">
-        <label>Téléphone</label><input type="tel" id="telephone">
+        <label>Nom <span class="req">*</span></label><input type="text" id="nom">
+        <label>Prénom <span class="req">*</span></label><input type="text" id="prenom">
+        <label>Adresse e-mail <span class="req">*</span></label><input type="email" id="email">
+        <label>Téléphone <span class="req">*</span></label><input type="tel" id="telephone">
         <label>Pourquoi as-tu besoin d'aide ?</label>
         <textarea id="raison" rows="4" placeholder="Décris brièvement la situation (matière, difficulté, âge de l'enfant...)"></textarea>
 
         <div class="divider"></div>
         <p class="small-muted">Choisis un identifiant et un mot de passe pour ton futur espace membre (utilisés seulement si ta demande est acceptée).</p>
-        <label>Identifiant souhaité</label><input type="text" id="username">
-        <label>Mot de passe (6 caractères min., sans caractère spécial)</label>
+        <label>Identifiant souhaité <span class="req">*</span></label><input type="text" id="username">
+        <label>Mot de passe (6 caractères min., sans caractère spécial) <span class="req">*</span></label>
         <div class="password-wrap">
           <input type="password" id="motdepasse" autocomplete="new-password">
           <button type="button" class="toggle-eye" onclick="togglePw('motdepasse', this)" aria-label="Afficher le mot de passe"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M1 12s4-7 11-7 11 7 11 7-4 7-11 7-11-7-11-7z"/><circle cx="12" cy="12" r="3"/></svg></button>
         </div>
         <p class="field-hint">Uniquement lettres et chiffres, 6 caractères minimum.</p>
+        <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
 
         <button class="btn mt-24" style="width:100%;" id="btnEnvoyer">Envoyer ma demande</button>
       </div>

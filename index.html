@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Céline Laruelle — Coach scolaire à Huy</title>
 <meta name="description" content="Céline Laruelle, professeure et coach scolaire à Huy. Accompagnement bienveillant des jeunes et de leurs familles.">
-<link rel="stylesheet" href="assets/style.css?v=V10">
+<link rel="stylesheet" href="assets/style.css?v=V12">
 </head>
 <body>
 
@@ -29,9 +29,9 @@
   </svg>
   <div class="container hero-splash-grid">
     <div>
-      <span class="hero-eyebrow">Coach scolaire · Huy</span>
+      <span class="hero-eyebrow" data-content-key="accueil_eyebrow">Coach scolaire · Huy</span>
       <h1 class="hero-xl">Et si les devoirs<br>arrêtaient d'être<br><em>un combat</em> ?</h1>
-      <p class="lead">18 ans d'enseignement, une formation en coaching scolaire, et une conviction : chaque jeune peut retrouver confiance et méthode — avec les bons outils, et beaucoup de bienveillance.</p>
+      <p class="lead" data-content-key="accueil_lead">18 ans d'enseignement, une formation en coaching scolaire, et une conviction : chaque jeune peut retrouver confiance et méthode — avec les bons outils, et beaucoup de bienveillance.</p>
       <div class="mt-24">
         <a href="contact.html" class="btn">Demander un accompagnement</a>
         <a href="livres.html" class="btn btn-outline" style="margin-left:12px;">Découvrir mon livre</a>
@@ -47,16 +47,16 @@
   <div class="container">
     <div class="grid-3">
       <div class="stat-card">
-        <span class="stat-number">18 ans</span>
-        <p>d'enseignement en économie sociale et familiale</p>
+        <span class="stat-number" data-content-key="accueil_stat1_nombre">18 ans</span>
+        <p data-content-key="accueil_stat1_texte">d'enseignement en économie sociale et familiale</p>
       </div>
       <div class="stat-card">
-        <span class="stat-number">100%</span>
-        <p>sur-mesure : chaque accompagnement part du jeune, pas d'un programme figé</p>
+        <span class="stat-number" data-content-key="accueil_stat2_nombre">100%</span>
+        <p data-content-key="accueil_stat2_texte">sur-mesure : chaque accompagnement part du jeune, pas d'un programme figé</p>
       </div>
       <div class="stat-card">
-        <span class="stat-number">1er livre</span>
-        <p>bientôt disponible, pour outiller aussi les parents à la maison</p>
+        <span class="stat-number" data-content-key="accueil_stat3_nombre">1er livre</span>
+        <p data-content-key="accueil_stat3_texte">bientôt disponible, pour outiller aussi les parents à la maison</p>
       </div>
     </div>
   </div>
@@ -87,7 +87,7 @@
 
 <section class="section-alt">
   <div class="container text-center" style="max-width:720px;">
-    <blockquote>« Un élève n'est pas "juste" une moyenne sur un bulletin. Derrière un "j'ai pas étudié", il y a parfois un manque de méthode, de motivation, de confiance... ou simplement un cerveau qui fonctionne autrement. »</blockquote>
+    <blockquote data-content-key="accueil_citation">« Un élève n'est pas "juste" une moyenne sur un bulletin. Derrière un "j'ai pas étudié", il y a parfois un manque de méthode, de motivation, de confiance... ou simplement un cerveau qui fonctionne autrement. »</blockquote>
   </div>
 </section>
 
@@ -118,5 +118,9 @@
 </footer>
 
 <script>document.getElementById('anneeCourante').textContent = new Date().getFullYear();</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/content.js"></script>
 </body>
 </html>

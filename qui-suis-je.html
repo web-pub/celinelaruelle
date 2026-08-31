@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Qui suis-je — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V10">
+<link rel="stylesheet" href="assets/style.css?v=V12">
 </head>
 <body>
 
@@ -32,9 +32,11 @@
 <section>
   <div class="container grid-2">
     <div>
-      <p>Depuis toujours, j'ai un truc avec les jeunes : déjà ado, pendant que certains profitaient tranquillement de leurs vacances, moi je passais les miennes à animer des plaines de jeux dans ma commune.</p>
-      <p>Puis j'ai attrapé le virus des valises : direction l'étranger pour animer et coordonner des camps de vacances avec des enfants et des ados. À cette époque, ma maman ne savait jamais très bien si j'étais rentrée... ou simplement repartie ailleurs avec un sac sur le dos.</p>
-      <p>Après toutes ces aventures, j'ai choisi de poursuivre des études dans le secteur pédagogique. Une chose était sûre : je voulais devenir prof. Le plus compliqué n'a pas été de choisir le métier... mais bien la matière ! J'ai finalement opté pour un AESI en économie sociale et familiale, un domaine qui me permettait d'allier humain, écoute et accompagnement. Aujourd'hui, cela fait 18 ans que j'enseigne avec toujours la même passion.</p>
+    <div data-content-key="qsj_intro" style="white-space:pre-line;">Depuis toujours, j'ai un truc avec les jeunes : déjà ado, pendant que certains profitaient tranquillement de leurs vacances, moi je passais les miennes à animer des plaines de jeux dans ma commune.
+
+Puis j'ai attrapé le virus des valises : direction l'étranger pour animer et coordonner des camps de vacances avec des enfants et des ados. À cette époque, ma maman ne savait jamais très bien si j'étais rentrée... ou simplement repartie ailleurs avec un sac sur le dos.
+
+Après toutes ces aventures, j'ai choisi de poursuivre des études dans le secteur pédagogique. Une chose était sûre : je voulais devenir prof. Le plus compliqué n'a pas été de choisir le métier... mais bien la matière ! J'ai finalement opté pour un AESI en économie sociale et familiale, un domaine qui me permettait d'allier humain, écoute et accompagnement. Aujourd'hui, cela fait 18 ans que j'enseigne avec toujours la même passion.</div>
     </div>
     <div class="hero-photo-wrap">
       <img src="assets/celine-photo.jpg" alt="Céline Laruelle" class="hero-photo" style="max-width:300px;">
@@ -46,9 +48,11 @@
   <div class="container" style="max-width:820px;">
     <h2>Une vocation</h2>
     <div class="divider"></div>
-    <p>L'enseignement est une véritable vocation pour moi. J'aime le contact avec les jeunes, comprendre leur fonctionnement, les aider à reprendre confiance et trouver des méthodes qui leur correspondent vraiment. Parce qu'un élève n'est pas "juste" une moyenne sur un bulletin.</p>
-    <p>Derrière un "j'ai pas étudié", il y a parfois un manque de méthode, de motivation, de confiance... ou simplement un cerveau qui fonctionne autrement.</p>
-    <p>Ma formation en coaching scolaire me permet d'aller encore plus loin dans l'accompagnement des jeunes et de leurs familles.</p>
+    <div data-content-key="qsj_vocation" style="white-space:pre-line;">L'enseignement est une véritable vocation pour moi. J'aime le contact avec les jeunes, comprendre leur fonctionnement, les aider à reprendre confiance et trouver des méthodes qui leur correspondent vraiment. Parce qu'un élève n'est pas "juste" une moyenne sur un bulletin.
+
+Derrière un "j'ai pas étudié", il y a parfois un manque de méthode, de motivation, de confiance... ou simplement un cerveau qui fonctionne autrement.
+
+Ma formation en coaching scolaire me permet d'aller encore plus loin dans l'accompagnement des jeunes et de leurs familles.</div>
   </div>
 </section>
 
@@ -56,10 +60,11 @@
   <div class="container">
     <div class="card" style="max-width:820px; margin:0 auto;">
       <h3>Et côté perso ?</h3>
-      <p>Je suis aussi maman de deux ados. Donc oui... moi aussi je connais les "j'ai pas de devoirs", les "on ne nous a rien demandé" et les feuilles importantes mystérieusement disparues au fond du sac.</p>
-      <p>Je sais à quel point il peut être difficile, en tant que parent, de trouver les bons mots et de réussir à se faire entendre sans transformer chaque devoir en négociation internationale.</p>
-      <blockquote>« Mon objectif aujourd'hui est simple : accompagner les jeunes avec bienveillance, humour et outils concrets pour les aider à avancer plus sereinement dans leur parcours scolaire. »</blockquote>
-      <p class="small-muted mt-24">Professeure à Sainte-Marie (Huy) depuis près de 20 ans · Maman de Julie et Valentin · Auteure de son premier livre, à paraître prochainement.</p>
+      <div data-content-key="qsj_perso" style="white-space:pre-line;">Je suis aussi maman de deux ados. Donc oui... moi aussi je connais les "j'ai pas de devoirs", les "on ne nous a rien demandé" et les feuilles importantes mystérieusement disparues au fond du sac.
+
+Je sais à quel point il peut être difficile, en tant que parent, de trouver les bons mots et de réussir à se faire entendre sans transformer chaque devoir en négociation internationale.</div>
+      <blockquote data-content-key="qsj_citation">« Mon objectif aujourd'hui est simple : accompagner les jeunes avec bienveillance, humour et outils concrets pour les aider à avancer plus sereinement dans leur parcours scolaire. »</blockquote>
+      <p class="small-muted mt-24" data-content-key="qsj_footer">Professeure à Sainte-Marie (Huy) depuis près de 20 ans · Maman de Julie et Valentin · Auteure de son premier livre, à paraître prochainement.</p>
     </div>
   </div>
 </section>
@@ -89,5 +94,9 @@
 </footer>
 
 <script>document.getElementById('anneeCourante').textContent = new Date().getFullYear();</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/content.js"></script>
 </body>
 </html>

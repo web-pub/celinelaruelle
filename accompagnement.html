@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Accompagnement — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V10">
+<link rel="stylesheet" href="assets/style.css?v=V12">
 </head>
 <body>
 
@@ -34,16 +34,16 @@
   <div class="container">
     <div class="grid-3">
       <div class="card">
-        <h3>Coaching individuel</h3>
-        <p>Des séances en tête-à-tête pour identifier ce qui bloque réellement : méthode de travail, organisation, gestion du stress avant les examens, ou simplement confiance en soi. On avance à son rythme, avec des outils concrets à réutiliser seul ensuite.</p>
+        <h3 data-content-key="acc_service1_titre">Coaching individuel</h3>
+        <p data-content-key="acc_service1_texte">Des séances en tête-à-tête pour identifier ce qui bloque réellement : méthode de travail, organisation, gestion du stress avant les examens, ou simplement confiance en soi. On avance à son rythme, avec des outils concrets à réutiliser seul ensuite.</p>
       </div>
       <div class="card">
-        <h3>Accompagnement des familles</h3>
-        <p>Parce que la scolarité se joue aussi à la maison, je propose des pistes concrètes aux parents pour désamorcer les tensions autour des devoirs, sans transformer chaque soirée en négociation. L'objectif : retrouver un climat serein autour du travail scolaire.</p>
+        <h3 data-content-key="acc_service2_titre">Accompagnement des familles</h3>
+        <p data-content-key="acc_service2_texte">Parce que la scolarité se joue aussi à la maison, je propose des pistes concrètes aux parents pour désamorcer les tensions autour des devoirs, sans transformer chaque soirée en négociation. L'objectif : retrouver un climat serein autour du travail scolaire.</p>
       </div>
       <div class="card">
-        <h3>Suivi personnalisé</h3>
-        <p>Chaque enfant suivi dispose d'un espace dédié où je partage régulièrement mes observations avec les parents : évolution, points d'attention, prochaines étapes. Une communication claire, tout au long de l'accompagnement.</p>
+        <h3 data-content-key="acc_service3_titre">Suivi personnalisé</h3>
+        <p data-content-key="acc_service3_texte">Chaque enfant suivi dispose d'un espace dédié où je partage régulièrement mes observations avec les parents : évolution, points d'attention, prochaines étapes. Une communication claire, tout au long de l'accompagnement.</p>
       </div>
     </div>
   </div>
@@ -53,8 +53,9 @@
   <div class="container" style="max-width:760px;">
     <h2>Pour qui ?</h2>
     <div class="divider"></div>
-    <p>Cet accompagnement s'adresse aux élèves du primaire au secondaire, quel que soit le point de départ : manque de méthode, motivation en berne, perte de confiance, ou simplement besoin d'un regard extérieur bienveillant pour repartir du bon pied.</p>
-    <p>Les séances peuvent se dérouler ponctuellement ou dans la durée, selon les besoins de chacun — c'est l'occasion d'en discuter ensemble lors d'un premier échange.</p>
+    <div data-content-key="acc_pourqui" style="white-space:pre-line;">Cet accompagnement s'adresse aux élèves du primaire au secondaire, quel que soit le point de départ : manque de méthode, motivation en berne, perte de confiance, ou simplement besoin d'un regard extérieur bienveillant pour repartir du bon pied.
+
+Les séances peuvent se dérouler ponctuellement ou dans la durée, selon les besoins de chacun — c'est l'occasion d'en discuter ensemble lors d'un premier échange.</div>
   </div>
 </section>
 
@@ -83,5 +84,9 @@
 </footer>
 
 <script>document.getElementById('anneeCourante').textContent = new Date().getFullYear();</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/content.js"></script>
 </body>
 </html>

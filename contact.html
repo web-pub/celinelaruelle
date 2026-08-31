@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Contact — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V10">
+<link rel="stylesheet" href="assets/style.css?v=V12">
 </head>
 <body>
 
@@ -26,7 +26,7 @@
   <div class="container text-center">
     <span class="hero-eyebrow">Prenons contact</span>
     <h1 style="font-size:clamp(2rem,4vw,2.8rem);">Envie d'un accompagnement ?</h1>
-    <p class="lead" style="margin:0 auto;">Complète le formulaire de demande, je reviens vers toi rapidement pour en discuter.</p>
+    <p class="lead" style="margin:0 auto;" data-content-key="contact_lead">Complète le formulaire de demande, je reviens vers toi rapidement pour en discuter.</p>
   </div>
 </header>
 
@@ -40,6 +40,7 @@
     <div class="card">
       <h3>Coordonnées</h3>
       <p><strong>Céline Laruelle</strong><br>Rue Vergiers 66, 4500 Huy</p>
+      <p><a href="tel:+32497557432">+32 497 55 74 32</a></p>
       <p><a href="https://www.facebook.com/share/19StTHKb8u/" target="_blank" rel="noopener">Suivre la page Facebook →</a></p>
       <p class="small-muted">N° BCE 0797006834 (non assujettie TVA)</p>
     </div>
@@ -64,5 +65,9 @@
 </footer>
 
 <script>document.getElementById('anneeCourante').textContent = new Date().getFullYear();</script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="assets/firebase-config.js"></script>
+<script src="assets/content.js"></script>
 </body>
 </html>

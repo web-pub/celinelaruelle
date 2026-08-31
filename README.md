@@ -1,6 +1,6 @@
 # Site Céline Laruelle — Coach scolaire
 
-Version : **celinelaruelle V10**
+Version : **celinelaruelle V12**
 Projet Firebase : **celinelaruellecoach** — Dépôt GitHub : **celinelaruelle**
 
 Structure volontairement plate (aucun sous-dossier, à part `assets/` qui contient tout directement) :
@@ -150,8 +150,15 @@ Le **P&L simplifié** (en haut de l'onglet Compta) calcule, pour l'année choisi
 | titre, description | string | présentation du livre |
 | statut | string | `bientot` \| `precommande` \| `disponible` |
 | prix | number/null | prix affiché si défini |
+| code | string | code du livre (ISBN ou référence interne) |
+| couverture | string | chemin de l'image (par défaut `assets/livre-cover.jpg`) |
 | publie | boolean | `true` = visible sur la page publique `livres.html` |
 | dateCreation | timestamp | pour le tri |
+
+### `site_content` — contenu éditable des pages publiques
+| Champ | Description |
+|---|---|
+| document `global` | contient un champ texte par bloc éditable (voir l'onglet "Contenu" en Admin/Super Admin) : accueil, qui-suis-je, accompagnement, contact. Un champ vide = le texte par défaut du site reste affiché. |
 
 ### `blog_articles`
 | Champ | Type | Description |

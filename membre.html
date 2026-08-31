@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Espace membre — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V10">
+<link rel="stylesheet" href="assets/style.css?v=V12">
 </head>
 <body class="app-shell">
 
@@ -31,10 +31,11 @@
       <div class="card" style="max-width:480px;">
         <h2>Ma fiche</h2>
         <div id="alerteFiche" class="alert alert-ok hidden"></div>
-        <label>Nom</label><input id="ficheNom">
-        <label>Prénom</label><input id="fichePrenom">
-        <label>Email</label><input id="ficheEmail" type="email">
+        <label>Nom <span class="req">*</span></label><input id="ficheNom">
+        <label>Prénom <span class="req">*</span></label><input id="fichePrenom">
+        <label>Email <span class="req">*</span></label><input id="ficheEmail" type="email">
         <label>Téléphone</label><input id="ficheTelephone">
+        <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
         <button class="btn mt-24" onclick="enregistrerFiche()">Enregistrer</button>
       </div>
       <div class="card carte-contact">
@@ -43,6 +44,7 @@
         <p class="small-muted" style="margin-top:-8px;">Coach scolaire</p>
         <div class="divider"></div>
         <p>Rue Vergiers 66<br>4500 Huy</p>
+        <p><a href="tel:+32497557432">+32 497 55 74 32</a></p>
         <p class="small-muted mt-24">Pour toute question, utilisez le formulaire de contact du site ou la messagerie du planning. Le journal de classe de votre/vos enfant(s) est votre canal de suivi principal.</p>
       </div>
     </div>
