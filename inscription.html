@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Demande d'accompagnement — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V12">
+<link rel="stylesheet" href="assets/style.css?v=V17">
 </head>
 <body>
 <nav class="site-nav">
@@ -33,6 +33,7 @@
         <div class="divider"></div>
         <p class="small-muted">Choisis un identifiant et un mot de passe pour ton futur espace membre (utilisés seulement si ta demande est acceptée).</p>
         <label>Identifiant souhaité <span class="req">*</span></label><input type="text" id="username">
+        <p class="field-hint">Uniquement lettres et chiffres, sans caractère spécial.</p>
         <label>Mot de passe (6 caractères min., sans caractère spécial) <span class="req">*</span></label>
         <div class="password-wrap">
           <input type="password" id="motdepasse" autocomplete="new-password">
@@ -65,6 +66,10 @@ document.getElementById('btnEnvoyer').addEventListener('click', async () => {
 
   if(!nom || !prenom || !email || !telephone || !username || !motdepasse){
     afficherAlerte('alerte', "Merci de remplir tous les champs.");
+    return;
+  }
+  if(/[^a-zA-Z0-9]/.test(username)){
+    afficherAlerte('alerte', "L'identifiant ne peut contenir que des lettres et des chiffres, sans caractère spécial.");
     return;
   }
   if(motdepasse.length < 6 || /[^a-zA-Z0-9]/.test(motdepasse)){

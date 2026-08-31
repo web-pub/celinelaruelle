@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Connexion — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V12">
+<link rel="stylesheet" href="assets/style.css?v=V17">
 </head>
 <body>
 <nav class="site-nav">
@@ -31,6 +31,21 @@
       <button class="btn mt-24" style="width:100%;" id="btnConnexion">Se connecter</button>
       <p class="small-muted text-center mt-24">Pas encore de compte ? <a href="inscription.html">Faire une demande d'accompagnement</a></p>
     </div>
+
+    <div class="form-box mt-24">
+      <h2 class="text-center">Pas encore membre ?</h2>
+      <p class="text-center" style="font-weight:500;">Devenez membre !</p>
+      <div id="alerteMini" class="alert alert-error hidden"></div>
+      <div id="succesMini" class="alert alert-ok hidden"></div>
+      <div id="formulaireMini">
+        <label>Nom <span class="req">*</span></label><input type="text" id="mini_nom">
+        <label>Prénom <span class="req">*</span></label><input type="text" id="mini_prenom">
+        <label>GSM <span class="req">*</span></label><input type="tel" id="mini_gsm">
+        <label>Email <span class="req">*</span></label><input type="email" id="mini_email">
+        <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
+        <button class="btn mt-24" style="width:100%;" id="btnDevenirMembre">Devenir membre</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -52,6 +67,36 @@ document.getElementById('btnConnexion').addEventListener('click', () => {
 });
 document.getElementById('motdepasse').addEventListener('keydown', e => {
   if(e.key === 'Enter') document.getElementById('btnConnexion').click();
+});
+
+document.getElementById('btnDevenirMembre').addEventListener('click', async () => {
+  masquerAlerte('alerteMini');
+  const nom = document.getElementById('mini_nom').value.trim();
+  const prenom = document.getElementById('mini_prenom').value.trim();
+  const telephone = document.getElementById('mini_gsm').value.trim();
+  const email = document.getElementById('mini_email').value.trim();
+
+  if(!nom || !prenom || !telephone || !email){
+    afficherAlerte('alerteMini', "Merci de remplir tous les champs.");
+    return;
+  }
+
+  const btn = document.getElementById('btnDevenirMembre');
+  btn.disabled = true; btn.textContent = 'Envoi en cours...';
+
+  try{
+    await db.collection('demandes_inscription').add({
+      nom, prenom, email, telephone, raison: '', username: '', motdepasse: '',
+      statut: 'en_attente',
+      dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('formulaireMini').classList.add('hidden');
+    afficherAlerte('succesMini', "Merci ! Céline reviendra vers toi pour activer ton accès membre.", 'ok');
+    document.getElementById('succesMini').classList.remove('hidden');
+  }catch(err){
+    afficherAlerte('alerteMini', traduireErreur(err));
+    btn.disabled = false; btn.textContent = 'Devenir membre';
+  }
 });
 </script>
 </body>

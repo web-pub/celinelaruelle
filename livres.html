@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Livres — Céline Laruelle</title>
 <meta name="description" content="Le livre de Céline Laruelle, coach scolaire, pour accompagner les jeunes et leurs familles.">
-<link rel="stylesheet" href="assets/style.css?v=V12">
+<link rel="stylesheet" href="assets/style.css?v=V17">
 </head>
 <body>
 
@@ -33,15 +33,6 @@
 
 <section>
   <div class="container" style="max-width:900px;">
-    <div class="grid-2 mb-24" style="align-items:start;">
-      <img src="assets/livre-cover.jpg" alt="Couverture du livre : Et si ce n'était pas de la mauvaise volonté ?" style="border-radius:var(--radius); box-shadow:var(--shadow); width:100%;">
-      <div>
-        <h2 style="font-size:1.6rem;">Et si ce n'était pas de la mauvaise volonté ?</h2>
-        <p class="small-muted">Comprendre les troubles invisibles pour mieux accompagner nos élèves</p>
-        <p>TDA(H), TSA, troubles DYS, haut potentiel, anxiété, harcèlement, manque de sommeil, phobie scolaire... Un guide pratique pour enseignants, parents et éducateurs, avec des explications accessibles, des situations vécues et des pistes concrètes pour accompagner les ados au quotidien.</p>
-        <p class="small-muted">Idée originale, texte et conception : Céline Laruelle.</p>
-      </div>
-    </div>
     <div id="listeLivresPublic"><p class="small-muted">Chargement...</p></div>
   </div>
 </section>
@@ -59,7 +50,9 @@
     </div>
   </div>
   <div class="container small-muted" style="margin-top:14px;">
-    © <span id="anneeCourante"></span> Hélène Laruelle. Tous droits réservés. Toute copie du site ou de son code est interdite.
+    © <span id="anneeCourante"></span> Hélène Laruelle — Tous droits réservés. Toute copie du site ou de son code est interdite.<br>
+    Site développé par Hélène Laruelle.<br>
+    Contenu sous la responsabilité de Céline Laruelle.
   </div>
 </footer>
 
@@ -93,8 +86,12 @@ async function chargerLivresPublics(){
           <span class="pill pill-valide" style="margin-bottom:12px; display:inline-block;">${statutLabel}</span>
           <h2 style="font-size:1.5rem;">${echapperHtmlLivre(l.titre)}</h2>
           <p style="white-space:pre-line;">${echapperHtmlLivre(l.description)}</p>
-          ${l.prix ? `<p><strong>${l.prix} €</strong></p>` : ''}
-          <a href="contact.html" class="btn mt-24">Être prévenu(e) / précommander</a>
+          <p class="small-muted">
+            ${l.prix ? `Prix : <strong>${l.prix} €</strong>` : ''}
+            ${l.code ? ` · Code ISBN : <strong>${echapperHtmlLivre(l.code)}</strong>` : ''}
+          </p>
+          <button class="btn mt-24" onclick="ouvrirFormPrecommande('${doc.id}','${echapperHtmlLivre(l.titre).replace(/'/g,"’")}')">Précommander</button>
+          <div id="formPrecommande_${doc.id}" class="mt-24 hidden"></div>
         </div>
       </div>`;
     });
@@ -104,6 +101,62 @@ async function chargerLivresPublics(){
   }
 }
 chargerLivresPublics();
+
+function ouvrirFormPrecommande(livreId, titre){
+  const zone = document.getElementById('formPrecommande_' + livreId);
+  if(!zone) return;
+  zone.classList.remove('hidden');
+  zone.innerHTML = `
+    <div class="divider"></div>
+    <div id="alertePrecommande_${livreId}" class="alert alert-error hidden"></div>
+    <div id="succesPrecommande_${livreId}" class="alert alert-ok hidden"></div>
+    <div id="champsPrecommande_${livreId}">
+      <label>Nom <span class="req">*</span></label><input id="pc_nom_${livreId}">
+      <label>Prénom <span class="req">*</span></label><input id="pc_prenom_${livreId}">
+      <label>Email <span class="req">*</span></label><input id="pc_email_${livreId}" type="email">
+      <label>Téléphone</label><input id="pc_telephone_${livreId}">
+      <label>Quantité</label><input id="pc_quantite_${livreId}" type="number" min="1" value="1">
+      <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
+      <button class="btn btn-sm mt-24" onclick="envoyerPrecommande('${livreId}', '${titre}')">Confirmer la précommande</button>
+    </div>
+  `;
+}
+
+async function envoyerPrecommande(livreId, titre){
+  const nom = document.getElementById('pc_nom_' + livreId).value.trim();
+  const prenom = document.getElementById('pc_prenom_' + livreId).value.trim();
+  const email = document.getElementById('pc_email_' + livreId).value.trim();
+  const telephone = document.getElementById('pc_telephone_' + livreId).value.trim();
+  const quantite = parseInt(document.getElementById('pc_quantite_' + livreId).value || '1', 10);
+  const alerteId = 'alertePrecommande_' + livreId;
+
+  if(!nom || !prenom || !email){
+    afficherAlerte(alerteId, "Merci de compléter au moins nom, prénom et email.");
+    return;
+  }
+  try{
+    await db.collection('precommandes_livres').add({
+      livreId, titre, nom, prenom, email, telephone, quantite,
+      statut: 'nouvelle',
+      dateAffichage: new Date().toLocaleDateString('fr-BE'),
+      dateCreation: firebase.firestore.FieldValue.serverTimestamp()
+    });
+    document.getElementById('champsPrecommande_' + livreId).classList.add('hidden');
+    document.getElementById('succesPrecommande_' + livreId).textContent = "Précommande envoyée ! Céline reviendra vers toi rapidement.";
+    document.getElementById('succesPrecommande_' + livreId).classList.remove('hidden');
+  }catch(err){
+    afficherAlerte(alerteId, "Impossible d'envoyer la précommande pour le moment. Réessaie dans un instant.");
+  }
+}
+
+/* Petites fonctions locales (la page publique n'inclut pas auth.js) */
+function afficherAlerte(elementId, message, type){
+  const el = document.getElementById(elementId);
+  if(!el) return;
+  el.textContent = message;
+  el.className = 'alert ' + (type === 'ok' ? 'alert-ok' : 'alert-error');
+  el.classList.remove('hidden');
+}
 </script>
 </body>
 </html>
