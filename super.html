@@ -4,12 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Super Admin — Céline Laruelle</title>
-<link rel="stylesheet" href="assets/style.css?v=V17">
+<link rel="stylesheet" href="assets/style.css?v=V18">
 </head>
 <body class="app-shell">
 
 <header class="app-header">
-  <div class="container">
+  <div class="container-wide">
     <div class="app-header-left">
       <span class="brand">Céline Laruelle</span>
       <span class="app-header-meta">
@@ -24,7 +24,7 @@
   </div>
 </header>
 
-<main class="container mt-24" style="flex:1;">
+<main class="container-wide" style="flex:1; padding-top:36px; padding-bottom:60px;">
   <div class="tabs">
     <button class="tab-btn active" data-tab="membres" onclick="activerOnglet('membres')">Membres</button>
     <button class="tab-btn" data-tab="planning" onclick="activerOnglet('planning')">Planning</button>
@@ -115,10 +115,8 @@
       <h2 style="margin:0;">Livres</h2>
       <button class="btn" onclick="ouvrirModalLivre()">+ Nouveau livre</button>
     </div>
+    <p class="small-muted mb-24">Les commandes se font depuis la Boutique (espace membre). Pense à ajouter aussi ce livre comme produit dans l'onglet Boutique pour que les membres puissent le commander.</p>
     <div id="listeLivres"></div>
-
-    <div class="toolbar mt-24"><h2 style="margin:0;">Précommandes reçues</h2></div>
-    <div id="listePrecommandes"></div>
   </section>
 
   <section id="tab-contenu" class="tab-panel">
@@ -132,7 +130,7 @@
   </section>
 </main>
 
-<footer><div class="container"><span class="small-muted">© <span id="an"></span> Hélène Laruelle</span><span id="versionTag2" class="small-muted"></span></div></footer>
+<footer><div class="container-wide" style="display:flex; justify-content:space-between; align-items:center;"><span class="small-muted">© <span id="an"></span> Hélène Laruelle</span><span id="versionTag2" class="small-muted"></span></div></footer>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>

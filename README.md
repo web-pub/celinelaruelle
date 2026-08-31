@@ -1,6 +1,6 @@
 # Site Céline Laruelle — Coach scolaire
 
-Version : **celinelaruelle V17**
+Version : **celinelaruelle V18**
 Projet Firebase : **celinelaruellecoach** — Dépôt GitHub : **celinelaruelle**
 
 Structure volontairement plate (aucun sous-dossier, à part `assets/` qui contient tout directement) :
@@ -155,16 +155,7 @@ Le **P&L simplifié** (en haut de l'onglet Compta) calcule, pour l'année choisi
 | publie | boolean | `true` = visible sur la page publique `livres.html` |
 | dateCreation | timestamp | pour le tri |
 
-### `precommandes_livres` — précommandes envoyées depuis la page publique Livres
-| Champ | Type | Description |
-|---|---|---|
-| livreId, titre | string | référence au livre précommandé |
-| nom, prenom, email, telephone | string | coordonnées du visiteur (formulaire public, pas besoin de compte) |
-| quantite | number | quantité souhaitée |
-| statut | string | `nouvelle` \| `traitee` |
-| dateAffichage, dateCreation | — | date lisible + tri |
-
-Visibles dans l'onglet **Livres** en Admin/Super Admin, sous "Précommandes reçues".
+Les commandes de livres se font via la **Boutique** (voir `boutique_produits` et `commandes` ci-dessous) : ajoute le livre comme produit dans l'onglet Boutique pour que les membres puissent le commander depuis leur espace.
 
 ### `site_content` — contenu éditable des pages publiques
 | Champ | Description |

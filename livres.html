@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Livres — Céline Laruelle</title>
 <meta name="description" content="Le livre de Céline Laruelle, coach scolaire, pour accompagner les jeunes et leurs familles.">
-<link rel="stylesheet" href="assets/style.css?v=V17">
+<link rel="stylesheet" href="assets/style.css?v=V18">
 </head>
 <body>
 
@@ -90,73 +90,17 @@ async function chargerLivresPublics(){
             ${l.prix ? `Prix : <strong>${l.prix} €</strong>` : ''}
             ${l.code ? ` · Code ISBN : <strong>${echapperHtmlLivre(l.code)}</strong>` : ''}
           </p>
-          <button class="btn mt-24" onclick="ouvrirFormPrecommande('${doc.id}','${echapperHtmlLivre(l.titre).replace(/'/g,"’")}')">Précommander</button>
-          <div id="formPrecommande_${doc.id}" class="mt-24 hidden"></div>
+          <a href="login.html" class="btn mt-24">Commander depuis mon espace membre</a>
+          <p class="small-muted mt-24">La commande se fait depuis la Boutique de l'espace membre. Pas encore membre ? <a href="login.html">Deviens membre</a> pour pouvoir commander.</p>
         </div>
       </div>`;
     });
     zone.innerHTML = html;
   }catch(err){
-    zone.innerHTML = '<div class="alert alert-error">Impossible de charger les informations pour le moment. Réessaie dans un instant.</div>';
+    zone.innerHTML = `<div class="alert alert-error">Impossible de charger les informations pour le moment (${err.code || err.message || 'erreur inconnue'}). Si le message mentionne un index, ouvre la console (F12) pour trouver le lien de création automatique.</div>`;
   }
 }
 chargerLivresPublics();
-
-function ouvrirFormPrecommande(livreId, titre){
-  const zone = document.getElementById('formPrecommande_' + livreId);
-  if(!zone) return;
-  zone.classList.remove('hidden');
-  zone.innerHTML = `
-    <div class="divider"></div>
-    <div id="alertePrecommande_${livreId}" class="alert alert-error hidden"></div>
-    <div id="succesPrecommande_${livreId}" class="alert alert-ok hidden"></div>
-    <div id="champsPrecommande_${livreId}">
-      <label>Nom <span class="req">*</span></label><input id="pc_nom_${livreId}">
-      <label>Prénom <span class="req">*</span></label><input id="pc_prenom_${livreId}">
-      <label>Email <span class="req">*</span></label><input id="pc_email_${livreId}" type="email">
-      <label>Téléphone</label><input id="pc_telephone_${livreId}">
-      <label>Quantité</label><input id="pc_quantite_${livreId}" type="number" min="1" value="1">
-      <p class="note-obligatoire"><span class="req">*</span> Champs obligatoires</p>
-      <button class="btn btn-sm mt-24" onclick="envoyerPrecommande('${livreId}', '${titre}')">Confirmer la précommande</button>
-    </div>
-  `;
-}
-
-async function envoyerPrecommande(livreId, titre){
-  const nom = document.getElementById('pc_nom_' + livreId).value.trim();
-  const prenom = document.getElementById('pc_prenom_' + livreId).value.trim();
-  const email = document.getElementById('pc_email_' + livreId).value.trim();
-  const telephone = document.getElementById('pc_telephone_' + livreId).value.trim();
-  const quantite = parseInt(document.getElementById('pc_quantite_' + livreId).value || '1', 10);
-  const alerteId = 'alertePrecommande_' + livreId;
-
-  if(!nom || !prenom || !email){
-    afficherAlerte(alerteId, "Merci de compléter au moins nom, prénom et email.");
-    return;
-  }
-  try{
-    await db.collection('precommandes_livres').add({
-      livreId, titre, nom, prenom, email, telephone, quantite,
-      statut: 'nouvelle',
-      dateAffichage: new Date().toLocaleDateString('fr-BE'),
-      dateCreation: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    document.getElementById('champsPrecommande_' + livreId).classList.add('hidden');
-    document.getElementById('succesPrecommande_' + livreId).textContent = "Précommande envoyée ! Céline reviendra vers toi rapidement.";
-    document.getElementById('succesPrecommande_' + livreId).classList.remove('hidden');
-  }catch(err){
-    afficherAlerte(alerteId, "Impossible d'envoyer la précommande pour le moment. Réessaie dans un instant.");
-  }
-}
-
-/* Petites fonctions locales (la page publique n'inclut pas auth.js) */
-function afficherAlerte(elementId, message, type){
-  const el = document.getElementById(elementId);
-  if(!el) return;
-  el.textContent = message;
-  el.className = 'alert ' + (type === 'ok' ? 'alert-ok' : 'alert-error');
-  el.classList.remove('hidden');
-}
 </script>
 </body>
 </html>
