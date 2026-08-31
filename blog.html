@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blog — Céline Laruelle</title>
 <meta name="description" content="Conseils, réflexions et actualités de Céline Laruelle, coach scolaire à Huy.">
-<link rel="stylesheet" href="assets/style.css?v=V20">
+<link rel="stylesheet" href="assets/style.css?v=V21">
 </head>
 <body>
 
@@ -71,14 +71,16 @@ function echapperHtml(txt){
 async function chargerArticlesPublics(){
   const zone = document.getElementById('listeArticlesPublic');
   try{
-    const snap = await db.collection('blog_articles').where('publie','==',true).orderBy('dateCreation','desc').get();
+    const snap = await db.collection('blog_articles').where('publie','==',true).get();
     if(snap.empty){
       zone.innerHTML = '<p class="small-muted">Aucun article publié pour le moment. Reviens bientôt !</p>';
       return;
     }
+    const articles = snap.docs
+      .map(doc => doc.data())
+      .sort((a, b) => (b.dateCreation?.toMillis?.() || 0) - (a.dateCreation?.toMillis?.() || 0));
     let html = '';
-    snap.forEach(doc => {
-      const a = doc.data();
+    articles.forEach(a => {
       html += `<article class="card mt-24">
         <p class="small-muted" style="margin-bottom:4px;">${a.dateAffichage || ''}</p>
         <h2 style="font-size:1.5rem;">${echapperHtml(a.titre)}</h2>
@@ -87,7 +89,7 @@ async function chargerArticlesPublics(){
     });
     zone.innerHTML = html;
   }catch(err){
-    zone.innerHTML = '<div class="alert alert-error">Impossible de charger les articles pour le moment. Réessaie dans un instant.</div>';
+    zone.innerHTML = `<div class="alert alert-error">Impossible de charger les articles pour le moment (${err.code || err.message || 'erreur inconnue'}).</div>`;
   }
 }
 chargerArticlesPublics();

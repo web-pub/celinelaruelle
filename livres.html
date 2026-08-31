@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Livres — Céline Laruelle</title>
 <meta name="description" content="Le livre de Céline Laruelle, coach scolaire, pour accompagner les jeunes et leurs familles.">
-<link rel="stylesheet" href="assets/style.css?v=V20">
+<link rel="stylesheet" href="assets/style.css?v=V21">
 </head>
 <body>
 
@@ -71,14 +71,16 @@ function echapperHtmlLivre(txt){
 async function chargerLivresPublics(){
   const zone = document.getElementById('listeLivresPublic');
   try{
-    const snap = await db.collection('livres').where('publie','==',true).orderBy('dateCreation','desc').get();
+    const snap = await db.collection('livres').where('publie','==',true).get();
     if(snap.empty){
       zone.innerHTML = '<p class="small-muted text-center">Le livre est en préparation — reviens bientôt pour en savoir plus !</p>';
       return;
     }
+    const livres = snap.docs
+      .map(doc => doc.data())
+      .sort((a, b) => (b.dateCreation?.toMillis?.() || 0) - (a.dateCreation?.toMillis?.() || 0));
     let html = '';
-    snap.forEach(doc => {
-      const l = doc.data();
+    livres.forEach(l => {
       const statutLabel = { bientot:'Bientôt disponible', precommande:'Précommande ouverte', disponible:'Disponible' }[l.statut] || l.statut;
       html += `<div class="card mt-24 livre-card">
         <img src="${l.couverture || 'assets/livre-cover.jpg'}" alt="Couverture — ${echapperHtmlLivre(l.titre)}" class="livre-cover">

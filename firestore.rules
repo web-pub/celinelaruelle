@@ -1,7 +1,7 @@
 // ===================================================================
 // FIRESTORE RULES — Projet Firebase : celinelaruellecoach
 // Dépôt GitHub (hébergement) : celinelaruelle
-// Version du site : celinelaruelle V20
+// Version du site : celinelaruelle V21
 // ===================================================================
 rules_version = '2';
 
