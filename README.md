@@ -1,6 +1,6 @@
 # Site Céline Laruelle — Coach scolaire
 
-Version : **celinelaruelle V18**
+Version : **celinelaruelle V19**
 Projet Firebase : **celinelaruellecoach** — Dépôt GitHub : **celinelaruelle**
 
 Structure volontairement plate (aucun sous-dossier, à part `assets/` qui contient tout directement) :
